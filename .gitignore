@@ -1,0 +1,13 @@
+node_modules
+dist
+*.local
+.DS_Store
+.vite
+coverage
+
+# Reference screenshots of a confidential SharePoint page — keep out of the public repo
+sharepoint-images/
+
+# Local Claude Code tooling
+.claude/
+*.tsbuildinfo
