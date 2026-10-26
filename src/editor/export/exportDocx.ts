@@ -6,6 +6,7 @@ import {
   Footer,
   Header,
   HeadingLevel,
+  HeightRule,
   ImageRun,
   LevelFormat,
   Packer,
@@ -24,6 +25,7 @@ import {
   type ParagraphChild,
 } from 'docx'
 import type { Node as PMNode, Mark } from '@tiptap/pm/model'
+import { STRONG_OPACITY } from '../extensions/blockStyle'
 import { colorHex } from '../lib/palette'
 import { pageGeometry } from '../pagination/geometry'
 import { fieldParts, hasSlots, type HeaderFooterSlots, type PageVars } from '../pagination/settings'
@@ -233,15 +235,25 @@ class Builder {
       }
       case 'table': {
         const header = hex(a.headerColor, '0F766E')
+        const headerOpacity = (a.headerOpacity ?? 13) / 100
         const rows: TableRow[] = []
         node.forEach((row, rowOffset) => {
           const cells: TableCell[] = []
           row.forEach((cell, cellOffset) => {
             const isHeader = cell.type.name === 'tableHeader'
+            const cellColor = cell.attrs.cellColor ? hex(cell.attrs.cellColor) : null
+            const opacity = (cell.attrs.cellOpacity ?? 22) / 100
+            const solid = !!cellColor && opacity * 100 >= STRONG_OPACITY
+            // Strong fills take white text, like on the page.
+            const previous = this.forceColor
+            if (solid) this.forceColor = 'FFFFFF'
             const inner = this.blocks(cell, pos + 1 + rowOffset + 1 + cellOffset + 1).map(b =>
-              b instanceof Paragraph && isHeader ? new Paragraph({ children: [new TextRun({ text: cell.textContent, bold: true, color: header })] }) : b,
+              b instanceof Paragraph && isHeader
+                ? new Paragraph({ children: [new TextRun({ text: cell.textContent, bold: true, color: solid || (!cellColor && headerOpacity * 100 >= STRONG_OPACITY) ? 'FFFFFF' : (cellColor ?? header) })] })
+                : b,
             )
-            const fill = cell.attrs.cellColor ? tint(hex(cell.attrs.cellColor), 0.15) : isHeader ? tint(header, 0.12) : undefined
+            this.forceColor = previous
+            const fill = cellColor ? tint(cellColor, opacity) : isHeader ? tint(header, headerOpacity) : undefined
             cells.push(
               new TableCell({
                 children: inner.length ? inner : [new Paragraph('')],
@@ -252,8 +264,22 @@ class Builder {
               }),
             )
           })
-          rows.push(new TableRow({ children: cells, tableHeader: rowOffset === 0 }))
+          const rowHeight = row.attrs.rowHeight as number | null
+          rows.push(new TableRow({ children: cells, tableHeader: rowOffset === 0, height: rowHeight ? { value: Math.round(rowHeight * TWIP), rule: HeightRule.ATLEAST } : undefined }))
         })
+        // Columns resized on the page keep their widths (scaled down if wider than the Word page).
+        const widths: number[] = []
+        node.firstChild?.forEach(cell => {
+          for (let i = 0; i < cell.attrs.colspan; i++) widths.push((cell.attrs.colwidth as number[] | null)?.[i] ?? 0)
+        })
+        const total = widths.reduce((sum, w) => sum + w, 0)
+        if (widths.length && widths.every(w => w > 0)) {
+          const fit = Math.min(1, this.contentWidth / total)
+          return [
+            new Table({ width: { size: Math.round(total * fit * TWIP), type: WidthType.DXA }, columnWidths: widths.map(w => Math.round(w * fit * TWIP)), rows }),
+            new Paragraph({ spacing: { after: 160 } }),
+          ]
+        }
         return [new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows }), new Paragraph({ spacing: { after: 160 } })]
       }
       case 'kpiGrid': {

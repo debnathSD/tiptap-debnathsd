@@ -1016,7 +1016,7 @@
   background: var(--surface-2);
   border-bottom: 2px solid var(--border-strong);
 }
-.pg-content :is(.tableWrapper[data-header], table[data-header]) th {
+.pg-content :is(.tableWrapper[data-header], table[data-header]) th:not([data-color]) {
   background: color-mix(in srgb, var(--c-header) calc(var(--tint) * 1.3), var(--page-bg));
   color: color-mix(in srgb, var(--c-header) 55%, var(--text));
   border-bottom-color: var(--c-header);
@@ -1027,12 +1027,32 @@
 .pg-content :is(.tableWrapper[data-table-style='bordered'], table[data-table-style='bordered']) :is(th, td) {
   border: 1px solid var(--border);
 }
-.pg-content :is(.tableWrapper[data-table-style='minimal'], table[data-table-style='minimal']) th {
+.pg-content :is(.tableWrapper[data-table-style='minimal'], table[data-table-style='minimal']) th:not([data-color]) {
   background: transparent;
 }
 .pg-content :is(.tableWrapper[data-table-style='minimal'], table[data-table-style='minimal']) td {
   border-bottom-color: transparent;
 }
+/* Cell colors win over the header color and the table style. */
 .pg-content :is(th, td)[data-color] {
-  background: color-mix(in srgb, var(--c) calc(var(--tint) * 1.2), var(--page-bg));
+  background: color-mix(in srgb, var(--c) calc(var(--tint) * 1.6 + 6%), var(--page-bg));
+}
+.pg-content th[data-color] {
+  color: color-mix(in srgb, var(--c) 60%, var(--text));
+  border-bottom-color: var(--c);
+}
+.pg-content :is(.tableWrapper, table)[data-header][data-header-opacity] th:not([data-color]) {
+  background: color-mix(in srgb, var(--c-header) var(--header-opacity), var(--page-bg));
+}
+.pg-content :is(.tableWrapper, table)[data-header][data-header-strong] th:not([data-color]) {
+  color: var(--c-header-on);
+}
+.pg-content :is(th, td)[data-color][data-cell-opacity] {
+  background: color-mix(in srgb, var(--c) var(--cell-opacity), var(--page-bg));
+}
+.pg-content :is(th, td)[data-color][data-cell-strong] {
+  color: var(--c-on);
+}
+.pg-content :is(th, td)[data-cell-strong] a {
+  color: inherit;
 }

@@ -3,6 +3,7 @@ import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Session } from '../auth/verify'
 import { BlockHandle } from '../editor/BlockHandle'
+import { TableControls } from '../editor/TableControls'
 import { EXPORT_LABELS, exportLayout, runExporter, type ExportKind } from '../editor/export/run'
 import { editorExtensions } from '../editor/extensions'
 import { HeaderFooterPanel, type HeaderFooterFocus } from '../editor/pagination/HeaderFooterPanel'
@@ -247,6 +248,7 @@ export function EditorScreen({
               <div className="pg-page" data-width={pageWidth} data-mode={editing ? 'edit' : 'view'}>
                 <EditorContent editor={editor} />
                 {editing && <BlockHandle editor={editor} />}
+                {editing && !busy && <TableControls editor={editor} />}
               </div>
             </PageSheet>
           </EditableContext.Provider>

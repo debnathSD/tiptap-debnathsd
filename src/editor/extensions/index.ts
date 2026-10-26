@@ -3,7 +3,7 @@ import FileHandler from '@tiptap/extension-file-handler'
 import Highlight from '@tiptap/extension-highlight'
 import Image from '@tiptap/extension-image'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
-import { TableCell, TableHeader, TableRow } from '@tiptap/extension-table'
+import { TableCell, TableHeader } from '@tiptap/extension-table'
 import { TableOfContents } from '@tiptap/extension-table-of-contents'
 import TextAlign from '@tiptap/extension-text-align'
 import { Color, TextStyle } from '@tiptap/extension-text-style'
@@ -19,6 +19,7 @@ import { Banner, Callout, Card } from './containers'
 import { Divider, Spacer } from './divider'
 import { Column, PageDocument, Section } from './section'
 import { SlashCommand } from './slashCommand'
+import { SizedTableRow, TableTools } from './tables'
 import { Chart, KpiGrid, PageProperties, QuickLinks, StatusPill, WebPartLinkGuard } from './webparts'
 
 const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml']
@@ -54,8 +55,9 @@ export function schemaExtensions(): Extensions {
     TextAlign.configure({ types: ['heading', 'paragraph'] }),
     TaskList,
     TaskItem.configure({ nested: true }),
-    StyledTable.configure({ resizable: true, cellMinWidth: 60 }),
-    TableRow,
+    StyledTable.configure({ resizable: true, cellMinWidth: 60, handleWidth: 7 }),
+    SizedTableRow,
+    TableTools,
     TableHeader,
     TableCell,
     Image.configure({

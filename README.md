@@ -41,6 +41,12 @@ npm run dev
 - **Sections**: hover a section for its toolbar (settings, move, duplicate, delete). Click the **+** under it to add a section with a chosen layout.
 - **Fold**: hover a heading and click its chevron. FAQ callouts and collapsible sections have their own chevrons.
 - **Move**: drag the ⋮⋮ handle, including between columns.
+- **Tables**: insert one with `/table` (it starts as a grid). Hover it while editing:
+  - **Add**: click **+** under it to add a row, or to its right to add a column.
+  - **Resize**: drag any column border or row border; double-click a row border to fit its content. Drag the corner grip to resize the whole table; double-click the grip for full width.
+  - **Color**: in the property pane, pick a palette color or type a hex code for the header or any cell, and set its opacity. At 60 % and above, text switches to a readable color.
+  - **Size buttons**: Full width, Even columns and Fit row heights.
+  - Downloads keep the sizes and colors.
 
 Your pages autosave for the session. Use **⋯ → Export HTML / JSON** to keep a copy.
 

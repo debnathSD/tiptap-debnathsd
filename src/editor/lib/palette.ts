@@ -35,6 +35,14 @@ export function isHexColor(value: unknown): value is `#${string}` {
   return typeof value === 'string' && HEX.test(value)
 }
 
+/** "0f766e", "#0F766E" or "#abc" → "#0f766e"; anything else → null. */
+export function parseHex(input: string): `#${string}` | null {
+  const raw = input.trim().replace(/^#?/, '#')
+  if (!HEX.test(raw)) return null
+  const digits = raw.slice(1).toLowerCase()
+  return `#${digits.length === 3 ? [...digits].map(d => d + d).join('') : digits}`
+}
+
 export function normalizeColor(value: unknown): ColorValue {
   if (isPaletteKey(value) || isHexColor(value)) return value
   return null
