@@ -15,7 +15,7 @@ import { OutlinePanel } from '../editor/panels/OutlinePanel'
 import { PropertyPane } from '../editor/panels/PropertyPane'
 import { Toolbar } from '../editor/toolbar/Toolbar'
 import type { PageRecord, PageStore } from '../pages/store'
-import { DownloadMenu, LayoutSwitch, PageSetupMenu } from './LayoutControls'
+import { DownloadMenu, LayoutMenuItems, LayoutSwitch, PageSetupMenu } from './LayoutControls'
 import { navigate, routes } from './router'
 import { StatusBar } from './StatusBar'
 import { TopBar, type ThemeState } from './TopBar'
@@ -220,6 +220,7 @@ export function EditorScreen({
             <DownloadMenu busy={busy ? exporting!.kind : null} onExport={runExport} />
           </>
         }
+        phoneMenu={close => <LayoutMenuItems value={effective.layout} onChange={layout => updateSettings({ ...settings, layout })} close={close} />}
         headerFooterOpen={editing && right === 'headerFooter'}
         onToggleHeaderFooter={() => (editing && right === 'headerFooter' ? setRight(null) : openHeaderFooter())}
         onReplace={replaceDocument}

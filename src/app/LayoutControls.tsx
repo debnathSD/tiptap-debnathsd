@@ -1,4 +1,4 @@
-import { Download, FileText, LoaderCircle, PanelsTopBottom, Presentation, RectangleHorizontal, RectangleVertical, ScrollText, Settings2, type LucideIcon } from 'lucide-react'
+import { Check, Download, FileText, LoaderCircle, PanelsTopBottom, Presentation, RectangleHorizontal, RectangleVertical, ScrollText, Settings2, type LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import type { ExportKind } from '../editor/export/run'
 import type { LayoutMode, PageSettings } from '../editor/pagination/settings'
@@ -23,13 +23,38 @@ export function LayoutSwitch({ value, onChange }: { value: LayoutMode; onChange:
   )
 }
 
+/** The layout choice as ⋯ menu items, for phones. */
+export function LayoutMenuItems({ value, onChange, close }: { value: LayoutMode; onChange: (layout: LayoutMode) => void; close: () => void }) {
+  return (
+    <>
+      {LAYOUTS.map(({ value: layout, label, Icon }) => (
+        <button
+          key={layout}
+          type="button"
+          role="menuitemradio"
+          aria-checked={value === layout}
+          className="menu__phone-only"
+          onClick={() => {
+            close()
+            onChange(layout)
+          }}
+        >
+          <Icon size={15} /> {label}
+          {value === layout && <Check size={14} className="menu__check" />}
+        </button>
+      ))}
+      <hr className="menu__phone-only" />
+    </>
+  )
+}
+
 /** Paper and margins, plus the way into the header & footer editor. */
 export function PageSetupMenu({ settings, onChange, onHeaderFooter }: { settings: PageSettings; onChange: (settings: PageSettings) => void; onHeaderFooter: () => void }) {
   const [open, setOpen] = useState(false)
   const ref = useDismiss(open, () => setOpen(false))
   const set = (patch: Partial<PageSettings>) => onChange({ ...settings, ...patch })
   return (
-    <div className="menu" ref={ref}>
+    <div className="menu topbar__setup" ref={ref}>
       <button type="button" className="icon-btn" title="Page setup" aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen(v => !v)}>
         <Settings2 size={18} />
       </button>

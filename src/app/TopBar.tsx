@@ -23,6 +23,8 @@ type Props = {
   onTogglePane: () => void
   /** Layout switch, page setup and downloads. */
   layoutControls?: ReactNode
+  /** Extra ⋯ menu items shown only on phones, where the layout switch doesn't fit the top bar. */
+  phoneMenu?: (close: () => void) => ReactNode
   headerFooterOpen: boolean
   onToggleHeaderFooter: () => void
   onReplace: (doc: JSONContent) => void
@@ -135,7 +137,7 @@ export function TopBar(props: Props) {
       </div>
 
       <div className="topbar__actions">
-        <button type="button" className="icon-btn" title="Product tour" onClick={() => navigate(routes.tour())}>
+        <button type="button" className="icon-btn topbar__tour" title="Product tour" onClick={() => navigate(routes.tour())}>
           <PlayCircle size={18} />
         </button>
         <button type="button" className="icon-btn" title={props.outlineOpen ? 'Hide outline' : 'Show outline'} aria-pressed={props.outlineOpen} onClick={props.onToggleOutline}>
@@ -147,7 +149,7 @@ export function TopBar(props: Props) {
           </button>
         )}
         {mode === 'edit' && (
-          <button type="button" className="icon-btn" title={props.headerFooterOpen ? 'Hide header & footer' : 'Header & footer'} aria-pressed={props.headerFooterOpen} onClick={props.onToggleHeaderFooter}>
+          <button type="button" className="icon-btn topbar__hf" title={props.headerFooterOpen ? 'Hide header & footer' : 'Header & footer'} aria-pressed={props.headerFooterOpen} onClick={props.onToggleHeaderFooter}>
             <PanelsTopBottom size={18} />
           </button>
         )}
@@ -158,6 +160,7 @@ export function TopBar(props: Props) {
           session={props.session}
           extra={close => (
             <>
+              {props.phoneMenu?.(close)}
               {!readOnly && (
                 <MenuItem
                   icon={<PencilLine size={15} />}

@@ -11,6 +11,8 @@
 }
 /* Canvas layout keeps the seamless SharePoint-style page: the sheet is just a wrapper. */
 .pg-sheet[data-paginate] {
+  /* Content lays out at the paper or slide width, not the window's: columns never stack inside a sheet. */
+  container-type: inline-size;
   position: relative;
   margin: 0 auto;
   background: var(--page-bg);

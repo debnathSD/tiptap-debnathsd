@@ -2126,9 +2126,32 @@ textarea.input {
     right: 0;
   }
 }
+.menu__panel .menu__phone-only {
+  display: none;
+}
+.menu__check {
+  margin-left: auto;
+  color: var(--accent-text);
+}
 @media (max-width: 640px) {
   .topbar {
     padding-inline: 10px 8px;
+  }
+  /* The layout switch moves into the ⋯ menu; header & footer open from a page margin. */
+  .layout-switch,
+  .topbar__setup,
+  .topbar__hf,
+  .topbar__tour {
+    display: none;
+  }
+  .menu__panel .menu__phone-only {
+    display: flex;
+  }
+  .menu__panel hr.menu__phone-only {
+    display: block;
+  }
+  .pg-canvas[data-paged] {
+    padding: 14px 10px 40px;
   }
   .topbar__title,
   .topbar__title-input,

@@ -46,7 +46,7 @@ Your pages autosave for the session. Use **⋯ → Export HTML / JSON** to keep 
 
 ## Pages, slides and downloads
 
-- **Layout** (top bar): **Portrait** is a Word page (A4, Letter or Legal) with a fixed page height. **Landscape** is a 16:9 PowerPoint slide (13.33 × 7.5 in). **Canvas** is one seamless page with no breaks. Switch at any time; nothing in the content changes.
+- **Layout** (top bar): **Portrait** is a Word page (A4, Letter or Legal) with a fixed page height. **Landscape** is a 16:9 PowerPoint slide (13.33 × 7.5 in). **Canvas** is one seamless page with no breaks. Switch at any time; nothing in the content changes. On phones the layout choice is in the **⋯** menu.
 - **Automatic page breaks**: in Portrait and Landscape, blocks flow onto the next page or slide as soon as they no longer fit. A block taller than a page makes its sheet taller rather than being cut. Wide sheets scale down to fit the window.
 - **Manual page break**: type `/page`, use **Insert → Page break**, or press **⌘/Ctrl + Enter**. Everything after it starts on a new page or slide.
 - **Header & footer**: open them from the top bar, from **Page setup**, or by double-clicking the top or bottom margin of any page. Each has left, center and right slots. Insert fields with one click: **page number**, **page count**, **title**, **author** and **date**. Quick styles (Page X of Y, Title and page, Report, Centered number, None), **Different first page** for a cover page, and **Divider lines** are built in.
