@@ -64,6 +64,21 @@ cd video && APP_URL=http://localhost:4317/ npm run capture && npm run render && 
 
 The first command installs the video tooling, the second serves a fresh `npm run build`, and the third re-captures the screenshots and re-renders `public/tour/`. `npm run studio` in `video/` opens Remotion Studio for editing.
 
+### Soundtrack
+
+The film has an original score with sound design, synthesized in code by `video/scripts/soundtrack.mjs` (no samples or licensed music):
+
+- **Music:** D major at 102.4 BPM, so each feature chapter is exactly three bars and every cut lands on a bar line. An ambient intro leads into a build under the page reveal; the beat drops on the first chapter, then come a breakdown, a final lift and a logo hit with a long tail.
+- **Sound design:** every on-screen action has a sound — physics landings (pitched, from the real simulation), whooshes on cuts, swooshes on zooms, spotlight pops, cursor clicks, list ticks and the feature-chip melody.
+- **Timing:** `video/scripts/events.ts` reads the same timeline, tour script and physics simulation as the picture, so sound can't drift from it.
+- **Mastering:** two-pass EBU R128 to −16 LUFS integrated and −1.5 dBTP true peak.
+
+```bash
+cd video && npm run soundtrack && npm run render
+```
+
+Run the soundtrack step after changing timings or the tour script, then re-render.
+
 ## Project layout
 
 ```

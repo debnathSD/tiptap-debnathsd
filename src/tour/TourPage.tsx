@@ -191,6 +191,7 @@ export function TourPage({ session, theme }: { session: Session; theme: ThemeSta
             Your browser can't play this video. <a href={`${BASE}tour/tiptap-pages-demo.mp4`}>Download it</a> instead.
           </video>
         </div>
+        <p className="tour__caption">🔊 Best with sound: an original score with sound design on every action.</p>
 
         <h2 className="tour__heading">Step by step</h2>
         <Tutorial />

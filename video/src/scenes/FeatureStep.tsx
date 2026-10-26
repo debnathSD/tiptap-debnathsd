@@ -2,6 +2,7 @@ import { AbsoluteFill, Easing, Img, interpolate, spring, staticFile, useCurrentF
 import { BrowserFrame, Cursor } from '../components/Chrome'
 import { cameraTransform, frameTarget, type TourStep as Step } from '../../../src/tour/steps'
 import { backdrop, colors, font, manifest, type Rect } from '../theme'
+import { CARD_AT, CLICK_AT, MOVE, POINT_AT, SPOT_AT, STEP_FRAMES, ZOOM_OUT_AT } from '../timeline'
 
 /**
  * Act 3 — one feature per chapter: the real screenshot in a browser frame,
@@ -11,13 +12,11 @@ import { backdrop, colors, font, manifest, type Rect } from '../theme'
 
 export type { Highlight, TourStep as Step } from '../../../src/tour/steps'
 
-export const STEP_FRAMES = 225
 
 const WIN_W = 1300
 const WIN_H = Math.round(WIN_W * (900 / 1440))
 const FRAME_X = 70
 const FRAME_Y = (1080 - WIN_H - 46) / 2 + 10
-const MOVE = 34 // frames for each camera move
 
 const ease = Easing.bezier(0.65, 0, 0.35, 1)
 
@@ -36,7 +35,7 @@ export function FeatureStep({ step, index, total }: { step: Step; index: number;
   // Camera keyframes: overview → each highlight → ease back out before the cut.
   const keys: Array<{ at: number; cam: Camera }> = [{ at: 0, cam: cameraFor(undefined, scale) }]
   for (const h of step.highlights) keys.push({ at: h.at, cam: cameraFor(rect(h.target), scale, h.zoom) })
-  keys.push({ at: STEP_FRAMES - MOVE - 8, cam: cameraFor(undefined, scale) })
+  keys.push({ at: ZOOM_OUT_AT, cam: cameraFor(undefined, scale) })
 
   let cam = keys[0].cam
   for (let i = 1; i < keys.length; i++) {
@@ -53,9 +52,9 @@ export function FeatureStep({ step, index, total }: { step: Step; index: number;
   const toScreen = (x: number, y: number) => ({ x: FRAME_X + tx + x * cam.z, y: FRAME_Y + 46 + ty + y * cam.z })
 
   // Active highlight: the latest one whose camera move has finished.
-  const active = [...step.highlights].reverse().find(h => frame >= h.at + MOVE * 0.6 && frame < STEP_FRAMES - MOVE - 8)
+  const active = [...step.highlights].reverse().find(h => frame >= SPOT_AT(h.at) && frame < ZOOM_OUT_AT)
   const activeIndex = active ? step.highlights.indexOf(active) : -1
-  const spotIn = active ? interpolate(frame, [active.at + MOVE * 0.6, active.at + MOVE + 6], [0, 1], { extrapolateRight: 'clamp' }) : 0
+  const spotIn = active ? interpolate(frame, [SPOT_AT(active.at), active.at + MOVE + 6], [0, 1], { extrapolateRight: 'clamp' }) : 0
 
   // Cursor path through clickable highlights.
   const clicks = step.highlights.filter(h => h.click && rect(h.target))
@@ -64,7 +63,7 @@ export function FeatureStep({ step, index, total }: { step: Step; index: number;
   for (const h of clicks) {
     const [x, y, w, hgt] = rect(h.target)!.map(v => v * scale)
     const target = toScreen(x + w / 2, y + hgt / 2)
-    const arrive = h.at + MOVE + 4
+    const arrive = CLICK_AT(h.at)
     const p = interpolate(frame, [h.at + 6, arrive], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: ease })
     cursor = { x: cursor.x + (target.x - cursor.x) * p, y: cursor.y + (target.y - cursor.y) * p }
     if (frame >= arrive) click = interpolate(frame, [arrive, arrive + 18], [0, 1], { extrapolateRight: 'clamp' })
@@ -72,7 +71,7 @@ export function FeatureStep({ step, index, total }: { step: Step; index: number;
 
   const enter = spring({ frame, fps, config: { damping: 20, stiffness: 90 } })
   const exit = interpolate(frame, [STEP_FRAMES - 14, STEP_FRAMES], [1, 0], { extrapolateLeft: 'clamp' })
-  const card = spring({ frame: frame - 10, fps, config: { damping: 18 } })
+  const card = spring({ frame: frame - CARD_AT, fps, config: { damping: 18 } })
   const tilt = (1 - enter) * 14
 
   return (
@@ -133,7 +132,7 @@ export function FeatureStep({ step, index, total }: { step: Step; index: number;
         <div style={{ fontSize: 25, lineHeight: 1.45, color: colors.muted }}>{step.body}</div>
         <div style={{ marginTop: 26, display: 'grid', gap: 14 }}>
           {step.points.map((point, i) => {
-            const on = spring({ frame: frame - 34 - i * 10, fps, config: { damping: 16 } })
+            const on = spring({ frame: frame - POINT_AT(i), fps, config: { damping: 16 } })
             const lit = activeIndex >= 0 && i === Math.min(activeIndex, step.points.length - 1)
             return (
               <div key={point} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', opacity: on, transform: `translateX(${(1 - on) * 24}px)` }}>

@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "capture": "node scripts/capture.mjs",
+    "soundtrack": "node scripts/soundtrack.mjs",
     "studio": "remotion studio src/index.ts",
     "render": "remotion render src/index.ts ProductDemo ../public/tour/tiptap-pages-demo.mp4",
     "poster": "remotion still src/index.ts ProductDemo ../public/tour/poster.jpg --frame=100",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@types/react": "^19.3.0",
     "@types/three": "0.186.0",
+    "esbuild": "0.28.1",
     "playwright": "1.64.1",
     "typescript": "~5.9.3"
   }

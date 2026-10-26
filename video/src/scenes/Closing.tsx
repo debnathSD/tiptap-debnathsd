@@ -2,29 +2,9 @@ import { AbsoluteFill, Img, interpolate, spring, staticFile, useCurrentFrame, us
 import { Chip } from '../components/Chrome'
 import { Particles } from '../components/Particles'
 import { backdrop, colors, font, manifest } from '../theme'
+import { CHIP_AT, DEVICES_FRAMES, FEATURE_CHIPS as FEATURES, LOGO_AT, OUTRO_FRAMES, OUTRO_TEXT_AT, OUTRO_URL_AT } from '../timeline'
 
 /** Act 4 — light, dark and phone, plus the full feature list. */
-export const DEVICES_FRAMES = 210
-
-const FEATURES = [
-  'Regions & layouts',
-  'Section backgrounds',
-  'Block colors',
-  'Dividers & spacers',
-  'Callouts & FAQs',
-  'Editorial cards',
-  'Banners',
-  'Quick links',
-  'KPI tiles',
-  'Bar charts',
-  'Status pills',
-  'Styled tables',
-  'Outline / TOC',
-  'Folding headings',
-  'Reading time',
-  'HTML & JSON export',
-]
-
 export function Devices() {
   const frame = useCurrentFrame()
   const { fps } = useVideoConfig()
@@ -67,7 +47,7 @@ export function Devices() {
         </div>
         <div style={{ marginTop: 44, display: 'flex', flexWrap: 'wrap', gap: 14, maxWidth: 1000 }}>
           {FEATURES.map((feature, i) => {
-            const on = spring({ frame: frame - 24 - i * 4, fps, config: { damping: 13, stiffness: 120 } })
+            const on = spring({ frame: frame - CHIP_AT(i), fps, config: { damping: 13, stiffness: 120 } })
             return (
               <Chip key={feature} accent={i % 5 === 0} style={{ opacity: on, transform: `translateY(${(1 - on) * 30}px) scale(${0.8 + on * 0.2})` }}>
                 {feature}
@@ -80,14 +60,12 @@ export function Devices() {
   )
 }
 
-export const OUTRO_FRAMES = 180
-
 export function Outro() {
   const frame = useCurrentFrame()
   const { fps } = useVideoConfig()
-  const logo = spring({ frame: frame - 6, fps, config: { damping: 12, stiffness: 90 } })
-  const text = spring({ frame: frame - 20, fps, config: { damping: 18 } })
-  const url = spring({ frame: frame - 40, fps, config: { damping: 18 } })
+  const logo = spring({ frame: frame - LOGO_AT, fps, config: { damping: 12, stiffness: 90 } })
+  const text = spring({ frame: frame - OUTRO_TEXT_AT, fps, config: { damping: 18 } })
+  const url = spring({ frame: frame - OUTRO_URL_AT, fps, config: { damping: 18 } })
   const fade = interpolate(frame, [0, 12, OUTRO_FRAMES - 20, OUTRO_FRAMES], [0, 1, 1, 0])
 
   return (

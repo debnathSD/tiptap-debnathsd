@@ -5,14 +5,13 @@ import { AbsoluteFill, Easing, interpolate, spring, staticFile, useCurrentFrame,
 import * as THREE from 'three'
 import { poseAt, SIM_FRAMES, THICKNESS, TILES } from '../lib/physics'
 import { backdrop, colors, font, HEIGHT, manifest, WIDTH } from '../theme'
+import { ASSEMBLE_AT, ASSEMBLE_STAGGER, INTRO_FRAMES, TAGLINE_AT, TITLE_AT } from '../timeline'
 
 /**
  * Act 1 — "blocks become a page". Real web-part crops fall under physics,
  * then fly into a page layout while the camera swings to a top-down view.
  */
 
-export const INTRO_FRAMES = 240
-const ASSEMBLE_AT = 118
 
 function CameraRig() {
   const frame = useCurrentFrame()
@@ -61,7 +60,7 @@ function Tiles() {
     <>
       {TILES.map((tile, i) => {
         const pose = poseAt(Math.min(frame, SIM_FRAMES - 1), i)
-        const assemble = spring({ frame: frame - ASSEMBLE_AT - i * 2.5, fps, config: { damping: 18, stiffness: 70, mass: 0.9 } })
+        const assemble = spring({ frame: frame - ASSEMBLE_AT - i * ASSEMBLE_STAGGER, fps, config: { damping: 18, stiffness: 70, mass: 0.9 } })
         const from = new THREE.Vector3(...pose.p)
         const to = new THREE.Vector3(tile.target[0], THICKNESS / 2 + 0.002 * i, tile.target[1])
         const position = from.lerp(to, assemble)
@@ -77,9 +76,9 @@ function Tiles() {
 export function BlocksIntro() {
   const frame = useCurrentFrame()
   const { fps } = useVideoConfig()
-  const title = spring({ frame: frame - 18, fps, config: { damping: 16 } })
+  const title = spring({ frame: frame - TITLE_AT, fps, config: { damping: 16 } })
   const titleOut = interpolate(frame, [ASSEMBLE_AT - 8, ASSEMBLE_AT + 14], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
-  const tagIn = interpolate(frame, [ASSEMBLE_AT + 40, ASSEMBLE_AT + 62], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+  const tagIn = interpolate(frame, [TAGLINE_AT, TAGLINE_AT + 22], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
   const fadeOut = interpolate(frame, [INTRO_FRAMES - 24, INTRO_FRAMES], [1, 0], { extrapolateLeft: 'clamp' })
 
   return (

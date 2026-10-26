@@ -86,6 +86,7 @@ Status: ✅ shipped · 🟡 partial · ⬜ planned
 | Demo video | Remotion + React Three Fiber + cannon-es physics. Real web-part tiles fall and assemble into a page, then one chapter per feature with zoom, spotlight, cursor and explanation |
 | Animated tutorial | In-app `#/tour` walkthrough of the same chapters over real screenshots; auto-play and keyboard controls |
 | Real captures | Playwright captures the running app plus the position of each UI element, so highlights land on real controls |
+| Score and sound design | Original music synthesized in code, with chapters on bar lines; a synced sound for every action; mastered to −16 LUFS |
 
 ---
 

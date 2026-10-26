@@ -1,21 +1,12 @@
 import { AbsoluteFill, Easing, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion'
 import { BrowserFrame } from '../components/Chrome'
 import { backdrop, colors, font, manifest } from '../theme'
+import { REVEAL_FRAMES, REVEAL_LABELS as LABELS } from '../timeline'
 
 /** Act 2 — the assembled page, scrolled top to bottom in a tilted browser window. */
 
-export const REVEAL_FRAMES = 200
-
 const WIN_W = 1180
 const WIN_H = 760
-const LABELS = [
-  { at: 30, text: 'Banner + page properties' },
-  { at: 52, text: 'KPI tiles with status' },
-  { at: 74, text: 'Two-column regions' },
-  { at: 96, text: 'Charts and styled tables' },
-  { at: 118, text: 'FAQs and quick links' },
-  { at: 140, text: 'Editorial cards' },
-]
 
 export function PageReveal() {
   const frame = useCurrentFrame()
