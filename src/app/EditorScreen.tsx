@@ -3,19 +3,26 @@ import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Session } from '../auth/verify'
 import { BlockHandle } from '../editor/BlockHandle'
+import { EXPORT_LABELS, exportLayout, runExporter, type ExportKind } from '../editor/export/run'
 import { editorExtensions } from '../editor/extensions'
+import { HeaderFooterPanel, type HeaderFooterFocus } from '../editor/pagination/HeaderFooterPanel'
+import { PageSheet } from '../editor/pagination/PageSheet'
+import { pageBreaks, waitForPagination } from '../editor/pagination/pagination'
+import { formatDate, isPaged, type HeaderFooterZone, type LayoutMode, type PageSettings, type PageVars } from '../editor/pagination/settings'
 import { EditableContext } from '../editor/lib/mode'
 import { textStats, type TextStats } from '../editor/lib/textStats'
 import { OutlinePanel } from '../editor/panels/OutlinePanel'
 import { PropertyPane } from '../editor/panels/PropertyPane'
 import { Toolbar } from '../editor/toolbar/Toolbar'
 import type { PageRecord, PageStore } from '../pages/store'
+import { DownloadMenu, LayoutSwitch, PageSetupMenu } from './LayoutControls'
 import { navigate, routes } from './router'
 import { StatusBar } from './StatusBar'
 import { TopBar, type ThemeState } from './TopBar'
 
 export type Mode = 'edit' | 'view'
 export type SaveState = { status: 'saved' | 'saving' | 'error' | 'readonly'; at: Date | null }
+export type ExportState = { kind: ExportKind; status: 'working' | 'done' | 'error'; message?: string } | null
 
 function useDebouncedStats(editor: Editor) {
   const [stats, setStats] = useState<TextStats>(() => textStats(editor.getJSON()))
@@ -80,9 +87,20 @@ export function EditorScreen({
   const [mode, setMode] = useState<Mode>(readOnly ? 'view' : 'edit')
   // Side panels overlay the page on narrow screens, so start with them closed there.
   const [outlineOpen, setOutlineOpen] = useState(() => window.innerWidth > 1100)
-  const [paneOpen, setPaneOpen] = useState(() => window.innerWidth > 1100)
+  const [right, setRight] = useState<'properties' | 'headerFooter' | null>(() => (window.innerWidth > 1100 ? 'properties' : null))
+  const [hfFocus, setHfFocus] = useState<HeaderFooterFocus | null>(null)
   const canvasRef = useRef<HTMLElement>(null)
-  const extensions = useMemo(() => editorExtensions(), [])
+  const sheetRef = useRef<HTMLDivElement>(null)
+
+  // Layout, paper, header and footer. Read-only templates can still switch layout; it just isn't saved.
+  const [settings, setSettings] = useState<PageSettings>(page.settings)
+  const [exporting, setExporting] = useState<ExportState>(null)
+  /** While a download renders, the page switches to the layout that file needs (Word = portrait, PowerPoint = slides). */
+  const [renderLayout, setRenderLayout] = useState<LayoutMode | null>(null)
+  const effective = useMemo(() => (renderLayout ? { ...settings, layout: renderLayout } : settings), [settings, renderLayout])
+  const vars = useMemo<PageVars>(() => ({ title: page.title.trim() || 'Untitled page', author: page.createdBy, date: formatDate(new Date()) }), [page.title, page.createdBy])
+
+  const extensions = useMemo(() => editorExtensions(page.settings, vars), []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const editor = useEditor({
     extensions,
@@ -97,10 +115,32 @@ export function EditorScreen({
   useEffect(() => {
     editor.setEditable(!readOnly && mode === 'edit')
   }, [editor, mode, readOnly])
+  useEffect(() => {
+    editor.commands.setPageSettings(effective)
+  }, [editor, effective])
+  useEffect(() => {
+    editor.commands.setPageVars(vars)
+  }, [editor, vars])
 
   const stats = useDebouncedStats(editor)
   const save = useAutosave(editor, page, store)
   const pageWidth = useEditorState({ editor, selector: ({ editor: e }) => (e.state.doc.attrs.pageWidth as string) ?? 'standard' })
+  const totalPages = useEditorState({ editor, selector: ({ editor: e }) => pageBreaks(e.state)?.total ?? 1 })
+
+  const updateSettings = useCallback(
+    (next: PageSettings) => {
+      setSettings(next)
+      if (!readOnly) store.update(page.id, { settings: next })
+    },
+    [page.id, readOnly, store],
+  )
+
+  const openHeaderFooter = (zone: HeaderFooterZone = 'footer') => {
+    if (readOnly) return
+    setMode('edit')
+    setRight('headerFooter')
+    setHfFocus({ zone, nonce: Date.now() })
+  }
 
   const replaceDocument = useCallback(
     (content: JSONContent) => {
@@ -112,9 +152,35 @@ export function EditorScreen({
   )
 
   const clone = useCallback(() => {
-    const copy = store.clone({ ...page, doc: editor.getJSON() })
+    const copy = store.clone({ ...page, doc: editor.getJSON(), settings })
     navigate(routes.page(copy.id))
-  }, [editor, page, store])
+  }, [editor, page, settings, store])
+
+  const runExport = async (kind: ExportKind) => {
+    if (!sheetRef.current || exporting?.status === 'working') return
+    const wasEditing = mode === 'edit'
+    const layout = exportLayout(kind, settings)
+    setExporting({ kind, status: 'working' })
+    setMode('view') // no editing chrome in the captures
+    setRenderLayout(layout)
+    try {
+      await new Promise(resolve => setTimeout(resolve, 200))
+      await waitForPagination(editor)
+      await runExporter(kind, { editor, sheet: sheetRef.current!, title: page.title, settings: { ...settings, layout }, vars, dark: theme.resolved === 'dark' })
+      setExporting({ kind, status: 'done' })
+    } catch (error) {
+      console.error(error)
+      setExporting({ kind, status: 'error', message: (error as Error).message })
+    } finally {
+      setRenderLayout(null)
+      if (wasEditing) setMode('edit')
+    }
+  }
+  useEffect(() => {
+    if (!exporting || exporting.status === 'working') return
+    const timer = setTimeout(() => setExporting(null), exporting.status === 'done' ? 4000 : 10000)
+    return () => clearTimeout(timer)
+  }, [exporting])
 
   const [progress, setProgress] = useState(0)
   useEffect(() => {
@@ -129,9 +195,11 @@ export function EditorScreen({
   }, [])
 
   const editing = !readOnly && mode === 'edit'
+  const busy = exporting?.status === 'working'
+  const paged = isPaged(effective)
 
   return (
-    <div className="app" data-mode={editing ? 'edit' : 'view'}>
+    <div className="app" data-mode={editing ? 'edit' : 'view'} data-exporting={busy || undefined} data-hf-editing={(editing && right === 'headerFooter' && !busy) || undefined}>
       <TopBar
         editor={editor}
         page={page}
@@ -141,8 +209,19 @@ export function EditorScreen({
         theme={theme}
         outlineOpen={outlineOpen}
         onToggleOutline={() => setOutlineOpen(v => !v)}
-        paneOpen={paneOpen}
-        onTogglePane={() => setPaneOpen(v => !v)}
+        paneOpen={right === 'properties'}
+        onTogglePane={() => setRight(right === 'properties' ? null : 'properties')}
+        layoutControls={
+          <>
+            <LayoutSwitch value={effective.layout} onChange={layout => updateSettings({ ...settings, layout })} />
+            {!readOnly && (
+              <PageSetupMenu settings={settings} onChange={updateSettings} onHeaderFooter={() => openHeaderFooter()} />
+            )}
+            <DownloadMenu busy={busy ? exporting!.kind : null} onExport={runExport} />
+          </>
+        }
+        headerFooterOpen={editing && right === 'headerFooter'}
+        onToggleHeaderFooter={() => (editing && right === 'headerFooter' ? setRight(null) : openHeaderFooter())}
         onReplace={replaceDocument}
         onRename={title => store.update(page.id, { title })}
         onClone={clone}
@@ -160,18 +239,32 @@ export function EditorScreen({
       )}
       <div className="app__body">
         {outlineOpen && <OutlinePanel editor={editor} stats={stats} canvasRef={canvasRef} onClose={() => setOutlineOpen(false)} />}
-        <main className="pg-canvas" ref={canvasRef}>
+        <main className="pg-canvas" ref={canvasRef} data-paged={paged || undefined}>
           {!editing && <div className="reading-progress" style={{ transform: `scaleX(${progress})` }} aria-hidden="true" />}
           <EditableContext.Provider value={editing}>
-            <div className="pg-page" data-width={pageWidth} data-mode={editing ? 'edit' : 'view'}>
-              <EditorContent editor={editor} />
-              {editing && <BlockHandle editor={editor} />}
-            </div>
+            <PageSheet settings={effective} sheetRef={sheetRef} fit={!busy} onEditBand={readOnly ? undefined : openHeaderFooter}>
+              <div className="pg-page" data-width={pageWidth} data-mode={editing ? 'edit' : 'view'}>
+                <EditorContent editor={editor} />
+                {editing && <BlockHandle editor={editor} />}
+              </div>
+            </PageSheet>
           </EditableContext.Provider>
         </main>
-        {editing && paneOpen && <PropertyPane editor={editor} stats={stats} onClose={() => setPaneOpen(false)} />}
+        {editing && right === 'properties' && <PropertyPane editor={editor} stats={stats} onClose={() => setRight(null)} />}
+        {editing && right === 'headerFooter' && (
+          <HeaderFooterPanel settings={settings} vars={vars} total={totalPages} focus={hfFocus} onChange={updateSettings} onClose={() => setRight(null)} />
+        )}
       </div>
-      <StatusBar stats={stats} save={save} mode={editing ? 'edit' : 'view'} />
+      <StatusBar
+        stats={stats}
+        save={save}
+        mode={editing ? 'edit' : 'view'}
+        layout={effective.layout === 'portrait' ? `${totalPages} page${totalPages === 1 ? '' : 's'} · ${settings.size} portrait` : effective.layout === 'landscape' ? `${totalPages} slide${totalPages === 1 ? '' : 's'} · 16:9` : 'Seamless canvas'}
+        notice={
+          exporting && (exporting.status === 'working' ? `Preparing ${EXPORT_LABELS[exporting.kind]}…` : exporting.status === 'done' ? `${EXPORT_LABELS[exporting.kind]} downloaded` : `Download failed: ${exporting.message}`)
+        }
+        noticeTone={exporting?.status === 'error' ? 'bad' : undefined}
+      />
     </div>
   )
 }

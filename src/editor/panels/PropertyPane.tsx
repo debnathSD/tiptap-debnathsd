@@ -16,6 +16,7 @@ import { Field, PaneSection, Segmented, Slider, Swatches, TextInput, Toggle } fr
 import { ItemsEditor } from './ItemsEditor'
 
 const LABELS: Record<string, string> = {
+  pageBreak: 'Page break',
   statusPill: 'Status pill',
   horizontalRule: 'Divider',
   spacer: 'Spacer',
@@ -117,6 +118,15 @@ function TargetPane({ editor, target }: { editor: Editor; target: Target }) {
             <Field label="Color">
               <Swatches value={a.color} noneLabel="Default" onChange={color => set({ color })} />
             </Field>
+          </PaneSection>
+          <NodeActions editor={editor} target={target} />
+        </>
+      )
+    case 'pageBreak':
+      return (
+        <>
+          <PaneSection title="Page break">
+            <p className="pane__note">Content after this block starts on a new page in Portrait, on a new slide in Landscape, and in the PDF, Word and PowerPoint downloads.</p>
           </PaneSection>
           <NodeActions editor={editor} target={target} />
         </>

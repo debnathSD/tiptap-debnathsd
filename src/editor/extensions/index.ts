@@ -11,6 +11,8 @@ import { Placeholder } from '@tiptap/extensions'
 import StarterKit from '@tiptap/starter-kit'
 import { readFileAsDataURL } from '../lib/dom'
 import { uid } from '../lib/nodeAttrs'
+import { PageBreak, Pagination } from '../pagination/pagination'
+import { DEFAULT_PAGE_SETTINGS, type PageSettings, type PageVars } from '../pagination/settings'
 import { BlockStyle, StyledTable } from './blockStyle'
 import { Collapsible } from './collapsible'
 import { Banner, Callout, Card } from './containers'
@@ -44,6 +46,7 @@ export function schemaExtensions(): Extensions {
     Chart,
     PageProperties,
     StatusPill,
+    PageBreak,
     BlockStyle,
     TextStyle,
     Color,
@@ -66,9 +69,10 @@ export function schemaExtensions(): Extensions {
 }
 
 /** Full authoring setup for the page editor. */
-export function editorExtensions(): Extensions {
+export function editorExtensions(settings: PageSettings = DEFAULT_PAGE_SETTINGS, vars: PageVars = { title: '', author: '', date: '' }): Extensions {
   return [
     ...schemaExtensions(),
+    Pagination.configure({ settings, vars }),
     SlashCommand,
     WebPartLinkGuard,
     Placeholder.configure({

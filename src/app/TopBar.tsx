@@ -1,5 +1,5 @@
 import type { Editor, JSONContent } from '@tiptap/core'
-import { ArrowLeft, Copy, Download, Eye, FileUp, ListTree, Lock, LogOut, Monitor, Moon, MoreHorizontal, PanelRight, Pencil, PencilLine, PlayCircle, Sun } from 'lucide-react'
+import { ArrowLeft, Copy, Download, Eye, FileUp, ListTree, Lock, LogOut, Monitor, Moon, MoreHorizontal, PanelRight, PanelsTopBottom, Pencil, PencilLine, PlayCircle, Sun } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { signOut, type Session } from '../auth/verify'
 import { exportHTML, exportJSON, importJSONFile } from '../editor/lib/exportPage'
@@ -21,6 +21,10 @@ type Props = {
   onToggleOutline: () => void
   paneOpen: boolean
   onTogglePane: () => void
+  /** Layout switch, page setup and downloads. */
+  layoutControls?: ReactNode
+  headerFooterOpen: boolean
+  onToggleHeaderFooter: () => void
   onReplace: (doc: JSONContent) => void
   onRename: (title: string) => void
   onClone: () => void
@@ -142,6 +146,13 @@ export function TopBar(props: Props) {
             <PanelRight size={18} />
           </button>
         )}
+        {mode === 'edit' && (
+          <button type="button" className="icon-btn" title={props.headerFooterOpen ? 'Hide header & footer' : 'Header & footer'} aria-pressed={props.headerFooterOpen} onClick={props.onToggleHeaderFooter}>
+            <PanelsTopBottom size={18} />
+          </button>
+        )}
+        {props.layoutControls && <span className="topbar__divider" aria-hidden="true" />}
+        {props.layoutControls}
         <ThemeButton theme={theme} />
         <UserMenu
           session={props.session}

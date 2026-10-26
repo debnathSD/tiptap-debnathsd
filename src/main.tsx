@@ -6,6 +6,7 @@ import { LoginGate } from './auth/LoginGate'
 import './styles/tokens.css'
 import './styles/content.css'
 import './styles/app.css'
+import './styles/paged.css'
 
 function Root() {
   // Owned here so the sign-in screen and the app share one light/dark choice.

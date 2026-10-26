@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { DEFAULT_PAGE_SETTINGS } from '../editor/pagination/settings'
 import { PageStore, TEMPLATE_ID } from './store'
 
 const memory = () => {
@@ -51,5 +52,24 @@ describe('page store', () => {
     expect(store.all().slice(1).map(p => p.title)).toEqual(['First, renamed', 'Second'])
     store.remove(first.id)
     expect(store.get(first.id)).toBeUndefined()
+  })
+
+  it('keeps layout, header and footer per page, and carries them into clones', () => {
+    const storage = memory()
+    const store = new PageStore(alice, storage)
+    expect(store.get(TEMPLATE_ID)!.settings.layout).toBe('canvas')
+    const page = store.create('Slides', undefined, { ...DEFAULT_PAGE_SETTINGS, layout: 'landscape' })
+    store.update(page.id, { settings: { ...page.settings, footer: { left: '', center: '{page}', right: '' } } })
+    const copy = store.clone(store.get(page.id)!)
+    expect(copy.settings).toMatchObject({ layout: 'landscape', footer: { center: '{page}' } })
+    // Survives a reload from session storage.
+    expect(new PageStore(alice, storage).get(copy.id)!.settings.layout).toBe('landscape')
+  })
+
+  it('gives pages saved before layouts existed the seamless canvas they had', () => {
+    const storage = memory()
+    const legacy = { id: 'old', title: 'Old', createdBy: 'alice', createdAt: '2026-10-01T00:00:00.000Z', updatedAt: '2026-10-01T00:00:00.000Z', template: false, doc: { type: 'doc', content: [{ type: 'paragraph' }] } }
+    storage.setItem('tiptap-pages:pages:digest-alice-000', JSON.stringify([legacy]))
+    expect(new PageStore(alice, storage).get('old')!.settings).toMatchObject({ layout: 'canvas', size: 'A4' })
   })
 })

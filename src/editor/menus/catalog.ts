@@ -24,6 +24,7 @@ import {
   PanelLeft,
   PanelRight,
   Quote,
+  SeparatorHorizontal,
   Square,
   Table2,
   Tag,
@@ -85,6 +86,15 @@ export const INSERT_ITEMS: InsertItem[] = [
     run: e => e.chain().focus().insertSection({ layout: 'one', attrs: { title: 'Section title', collapsible: true, border: 'subtle' } }).run(),
   },
   { id: 'divider', title: 'Divider', description: 'Horizontal line between content', group: 'Layout', icon: Minus, keywords: ['hr', 'line', 'rule', 'separator'], run: e => insertBlock(e, { type: 'horizontalRule' }) },
+  {
+    id: 'page-break',
+    title: 'Page break',
+    description: 'Start a new page or slide',
+    group: 'Layout',
+    icon: SeparatorHorizontal,
+    keywords: ['page', 'break', 'new page', 'slide', 'pagination'],
+    run: e => e.chain().focus().insertPageBreak().run(),
+  },
   { id: 'spacer', title: 'Spacer', description: 'Adjustable vertical space', group: 'Layout', icon: MoveVertical, keywords: ['space', 'gap', 'whitespace'], run: e => insertBlock(e, { type: 'spacer', attrs: { height: 48 } }) },
   {
     id: 'banner',

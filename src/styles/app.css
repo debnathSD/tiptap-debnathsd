@@ -1800,6 +1800,24 @@ textarea.input {
 .dialog__choices small {
   color: var(--text-muted);
 }
+.dialog__choices--row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.dialog__choices--row label {
+  gap: 8px;
+  padding: 8px 10px;
+}
+.dialog__choices--row input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.pages-table__layout {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
 .dialog__note {
   margin: 0;
   font-size: 12.5px;
@@ -2118,7 +2136,8 @@ textarea.input {
   .topbar__product,
   .readonly-banner > span,
   .mode-switch__label,
-  .statusbar__item:nth-child(3) {
+  .statusbar__item:nth-child(3),
+  .statusbar__item:nth-child(4) {
     display: none;
   }
   .mode-switch {
@@ -2138,4 +2157,11 @@ textarea.input {
     animation: none !important;
     scroll-behavior: auto !important;
   }
+}
+.dialog__choices--row label {
+  position: relative;
+}
+.dialog__choices--row label:focus-within {
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  outline-offset: 1px;
 }

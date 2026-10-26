@@ -4,7 +4,10 @@ A SharePoint-style page editor built on [Tiptap](https://tiptap.dev). It
 includes regions with column layouts and backgrounds, colored blocks,
 dividers, spacers, callouts and FAQs, editorial cards, banners, quick links,
 KPI tiles, charts, status pills, an outline panel, folding headings and
-reading time.
+reading time. Pages can be laid out as Word-style portrait pages, 16:9
+PowerPoint-style slides or one seamless canvas, with automatic page breaks,
+custom headers and footers with page numbers, and downloads as PDF, Word
+and PowerPoint.
 
 See [ROADMAP.md](ROADMAP.md) for the phase-by-phase plan and what is shipped.
 
@@ -18,14 +21,14 @@ npm run dev
 | Script | What it does |
 | --- | --- |
 | `npm run dev` | Dev server at http://localhost:5173 |
-| `npm test` | Unit tests (schema round-trip, layouts, folding, stats, sign-in, page store) |
+| `npm test` | Unit tests (schema round-trip, layouts, folding, stats, sign-in, page store, page settings, page breaks) |
 | `npm run typecheck` | TypeScript |
 | `npm run build` | Production build in `dist/` |
 
 ## Pages, templates and accounts
 
 - After signing in you land on the **Pages** list. It's a table of every page you can open, with name, type, who created it, creation date, last change and word count.
-- **Create new page** starts from a blank page or from the status-report template.
+- **Create new page** starts from a blank page or from the status-report template, in the layout you pick: Portrait, Landscape or Canvas.
 - The built-in **status report is a read-only template**. Open it to read, or **Clone** it to get your own editable copy.
 - **Rename** your pages from the ✎ button in the list, or click the page name in the editor's top bar. Enter saves, Escape cancels. Templates can't be renamed.
 - Pages you create or clone belong to the signed-in account and are kept in that browser tab's session storage. Other accounts never see them, and they disappear when the tab closes.
@@ -40,6 +43,19 @@ npm run dev
 - **Move**: drag the ⋮⋮ handle, including between columns.
 
 Your pages autosave for the session. Use **⋯ → Export HTML / JSON** to keep a copy.
+
+## Pages, slides and downloads
+
+- **Layout** (top bar): **Portrait** is a Word page (A4, Letter or Legal) with a fixed page height. **Landscape** is a 16:9 PowerPoint slide (13.33 × 7.5 in). **Canvas** is one seamless page with no breaks. Switch at any time; nothing in the content changes.
+- **Automatic page breaks**: in Portrait and Landscape, blocks flow onto the next page or slide as soon as they no longer fit. A block taller than a page makes its sheet taller rather than being cut. Wide sheets scale down to fit the window.
+- **Manual page break**: type `/page`, use **Insert → Page break**, or press **⌘/Ctrl + Enter**. Everything after it starts on a new page or slide.
+- **Header & footer**: open them from the top bar, from **Page setup**, or by double-clicking the top or bottom margin of any page. Each has left, center and right slots. Insert fields with one click: **page number**, **page count**, **title**, **author** and **date**. Quick styles (Page X of Y, Title and page, Report, Centered number, None), **Different first page** for a cover page, and **Divider lines** are built in.
+- **Page setup**: paper size for portrait pages, and narrow, normal or wide margins.
+- **Download** (⤓ in the top bar):
+  - **PDF**: one page per sheet, exactly as laid out (canvas pages print as portrait).
+  - **Word (.docx)**: native, editable headings, lists, tables, columns, callouts and links on portrait pages. Header and footer are real Word headers with live page-number fields.
+  - **PowerPoint (.pptx)**: one 16:9 slide per landscape page. Text, lists and tables are editable PowerPoint objects; KPI tiles, charts and cards are images. Header and footer are on every slide.
+- The read-only template can switch layout and be downloaded too; the choice just isn't saved.
 
 ## Product tour and demo video
 
@@ -88,6 +104,8 @@ src/
   editor/
     extensions/           schema and behaviour (sections, containers, web parts, folding, slash menu)
     nodeviews/            React node views (section chrome, spacer resize, callout, card)
+    pagination/           page settings, page/slide geometry, automatic page breaks, header & footer
+    export/               PDF, Word and PowerPoint downloads (loaded on demand)
     panels/               outline (TOC) and property pane
     menus/catalog.ts      single catalog behind "/", Insert and "+"
     content/              JSON builders and the sample page

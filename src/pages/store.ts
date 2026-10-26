@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react'
 import type { Session } from '../auth/verify'
 import { samplePage } from '../editor/content/samplePage'
 import { uid } from '../editor/lib/nodeAttrs'
+import { DEFAULT_PAGE_SETTINGS, normalizeSettings, type PageSettings } from '../editor/pagination/settings'
 
 /**
  * Pages for the signed-in account. The built-in report is a read-only
@@ -21,6 +22,8 @@ export type PageRecord = {
   /** Title of the page this one was cloned from, if any. */
   clonedFrom?: string
   doc: JSONContent
+  /** Layout (portrait pages, landscape slides or seamless canvas), paper, margins, header and footer. */
+  settings: PageSettings
 }
 
 export const TEMPLATE_ID = 'fy26-status-report'
@@ -34,6 +37,8 @@ export function templatePage(): PageRecord {
     updatedAt: '2026-10-26T06:00:00.000Z',
     template: true,
     doc: samplePage(),
+    // The SharePoint-style report reads best as one seamless canvas; switch to pages or slides any time.
+    settings: { ...DEFAULT_PAGE_SETTINGS, layout: 'canvas' },
   }
 }
 
@@ -68,7 +73,8 @@ export class PageStore {
   private load(): PageRecord[] {
     try {
       const parsed = JSON.parse(this.storage.getItem(storageKey(this.session)) ?? '[]')
-      return Array.isArray(parsed) ? parsed : []
+      // Pages saved before layouts existed get the defaults.
+      return Array.isArray(parsed) ? parsed.map((page: PageRecord) => ({ ...page, settings: normalizeSettings(page.settings ?? { layout: 'canvas' }) })) : []
     } catch {
       return []
     }
@@ -98,7 +104,7 @@ export class PageStore {
     return id === TEMPLATE_ID ? this.template : this.pages.find(p => p.id === id)
   }
 
-  create(title: string, from?: PageRecord): PageRecord {
+  create(title: string, from?: PageRecord, settings?: PageSettings): PageRecord {
     const now = new Date().toISOString()
     const name = title.trim() || 'Untitled page'
     const page: PageRecord = {
@@ -110,6 +116,7 @@ export class PageStore {
       template: false,
       ...(from ? { clonedFrom: from.title } : {}),
       doc: from ? structuredClone(from.doc) : blankDoc(name),
+      settings: settings ?? (from ? structuredClone(from.settings) : DEFAULT_PAGE_SETTINGS),
     }
     this.commit([...this.pages, page])
     return page
@@ -119,7 +126,7 @@ export class PageStore {
     return this.create(`Copy of ${source.title}`, source)
   }
 
-  update(id: string, patch: Partial<Pick<PageRecord, 'title' | 'doc'>>) {
+  update(id: string, patch: Partial<Pick<PageRecord, 'title' | 'doc' | 'settings'>>) {
     if (id === TEMPLATE_ID) return
     this.commit(this.pages.map(p => (p.id === id ? { ...p, ...patch, updatedAt: new Date().toISOString() } : p)))
   }

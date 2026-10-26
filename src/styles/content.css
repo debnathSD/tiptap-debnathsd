@@ -54,6 +54,7 @@
   font-size: 1rem;
 }
 .pg-content > :first-child,
+.pg-content > .pg-page-start:first-child + *,
 .pg-column > :first-child,
 .pg-column [data-node-view-content-react] > :first-child {
   margin-top: 0;
@@ -958,6 +959,7 @@
   font-size: 12.5px;
 }
 .pg-props dt {
+  white-space: nowrap;
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.08em;

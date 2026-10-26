@@ -3,7 +3,9 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import type { Session } from '../auth/verify'
 import { navigate, routes } from '../app/router'
 import { ThemeButton, UserMenu, type ThemeState } from '../app/TopBar'
+import { LAYOUTS } from '../app/LayoutControls'
 import { textStats } from '../editor/lib/textStats'
+import { DEFAULT_PAGE_SETTINGS, type LayoutMode } from '../editor/pagination/settings'
 import { TEMPLATE_ID, usePages, type PageRecord, type PageStore } from './store'
 
 const dateFormat = new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short', year: 'numeric' })
@@ -22,6 +24,9 @@ function When({ iso }: { iso: string }) {
 function CreateDialog({ store, onClose }: { store: PageStore; onClose: () => void }) {
   const [title, setTitle] = useState('')
   const [start, setStart] = useState<'blank' | 'template'>('blank')
+  // Blank pages start as portrait documents and the template as a seamless canvas, until the user picks.
+  const [layout, setLayout] = useState<LayoutMode | null>(null)
+  const chosen = layout ?? (start === 'template' ? 'canvas' : 'portrait')
   const dialog = useRef<HTMLDialogElement>(null)
   const nameRef = useRef<HTMLInputElement>(null)
 
@@ -34,7 +39,7 @@ function CreateDialog({ store, onClose }: { store: PageStore; onClose: () => voi
   const submit = (event: FormEvent) => {
     event.preventDefault()
     const from = start === 'template' ? store.get(TEMPLATE_ID) : undefined
-    const page = store.create(title || (from ? `Copy of ${from.title}` : 'Untitled page'), from)
+    const page = store.create(title || (from ? `Copy of ${from.title}` : 'Untitled page'), from, { ...(from?.settings ?? DEFAULT_PAGE_SETTINGS), layout: chosen })
     navigate(routes.page(page.id))
   }
 
@@ -69,6 +74,19 @@ function CreateDialog({ store, onClose }: { store: PageStore; onClose: () => voi
               <small>Banner, KPIs, regions, charts and FAQs</small>
             </span>
           </label>
+        </fieldset>
+        <fieldset className="dialog__choices dialog__choices--row">
+          <legend>Layout</legend>
+          {LAYOUTS.map(({ value, label, title: hint, Icon }) => (
+            <label key={value} data-checked={chosen === value || undefined} title={hint}>
+              <input type="radio" name="layout" checked={chosen === value} onChange={() => setLayout(value)} />
+              <Icon size={18} />
+              <span>
+                <strong>{label}</strong>
+                <small>{value === 'portrait' ? 'Word pages' : value === 'landscape' ? '16:9 slides' : 'No page breaks'}</small>
+              </span>
+            </label>
+          ))}
         </fieldset>
         <p className="dialog__note">Your pages are private to your account and kept for this browser session.</p>
         <footer className="dialog__footer">
@@ -229,6 +247,7 @@ export function PagesList({ store, session, theme }: { store: PageStore; session
                   </td>
                   <td>
                     {page.template ? <span className="pg-pill" data-tone="info">Template · read-only</span> : <span className="pg-pill" data-tone="good">Your page</span>}
+                    <small className="pages-table__layout">{LAYOUTS.find(l => l.value === page.settings.layout)?.label}</small>
                   </td>
                   <td>{page.createdBy}</td>
                   <td>

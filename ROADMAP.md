@@ -88,6 +88,19 @@ Status: ✅ shipped · 🟡 partial · ⬜ planned
 | Real captures | Playwright captures the running app plus the position of each UI element, so highlights land on real controls |
 | Score and sound design | Original music synthesized in code, with chapters on bar lines; a synced sound for every action; mastered to −16 LUFS |
 
+## Phase 6c — Pages, slides and downloads ✅
+
+| Feature | Notes |
+| --- | --- |
+| Layouts | Portrait (A4 / Letter / Legal Word page), Landscape (16:9 PowerPoint slide, 13.33 × 7.5 in), Canvas (seamless). Switch any time; chosen when creating a page |
+| Automatic page breaks | Measured from the rendered blocks; breaks fall between top-level blocks. Sheets scale to fit narrow windows |
+| Manual page break | Page-level block from `/`, Insert or ⌘/Ctrl + Enter |
+| Custom header & footer | Left / center / right slots with page number, page count, title, author and date fields; quick styles; different first page; divider lines; double-click a margin to edit |
+| Page setup | Paper size and margins |
+| PDF download | One page per sheet, as laid out |
+| Word download | Native document with Word headers/footers and live page-number fields |
+| PowerPoint download | One slide per landscape page; native text, lists and tables; images for visual web parts |
+
 ---
 
 ## Next phases ⬜
