@@ -52,7 +52,7 @@ const ALL_STEPS: TourStep[] = [
     shot: 'pages',
     title: 'All your pages in one list',
     body: 'The home screen lists every page you can open: its name, type, author, creation date, last change and length.',
-    points: ['Create a page with one click', 'The status report is a read-only template', 'Your pages stay private to your account'],
+    points: ['Create a page with one click', 'Rename, clone or delete your own pages', 'The status report is a read-only template'],
     highlights: [
       { target: 'create', at: 14, zoom: 1.9, click: true, label: 'Create new page' },
       { target: 'table', at: 78, zoom: 1.15, label: 'Name, author, dates' },
