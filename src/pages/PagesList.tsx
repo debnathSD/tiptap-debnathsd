@@ -1,4 +1,4 @@
-import { Copy, Eye, FilePlus2, FileText, Lock, Pencil, PlayCircle, Search, Trash2, X } from 'lucide-react'
+import { Check, Copy, Eye, FilePlus2, FileText, Lock, Pencil, PencilLine, PlayCircle, Search, Trash2, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import type { Session } from '../auth/verify'
 import { navigate, routes } from '../app/router'
@@ -84,6 +84,38 @@ function CreateDialog({ store, onClose }: { store: PageStore; onClose: () => voi
   )
 }
 
+/** Inline page-name editor: Enter or ✓ saves, Escape or ✕ cancels. */
+function RenameForm({ page, onSave, onCancel }: { page: PageRecord; onSave: (title: string) => void; onCancel: () => void }) {
+  const [value, setValue] = useState(page.title)
+  const input = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    input.current?.focus()
+    input.current?.select()
+  }, [])
+  const save = (event?: FormEvent) => {
+    event?.preventDefault()
+    onSave(value.trim() || 'Untitled page')
+  }
+  return (
+    <form className="rename-form" onSubmit={save}>
+      <input
+        ref={input}
+        className="input"
+        value={value}
+        aria-label="Page name"
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={e => e.key === 'Escape' && onCancel()}
+      />
+      <button type="submit" className="icon-btn" title="Save name" aria-label="Save name">
+        <Check size={16} />
+      </button>
+      <button type="button" className="icon-btn" title="Cancel" aria-label="Cancel rename" onClick={onCancel}>
+        <X size={16} />
+      </button>
+    </form>
+  )
+}
+
 function DeleteButton({ onConfirm, name }: { onConfirm: () => void; name: string }) {
   const [armed, setArmed] = useState(false)
   useEffect(() => {
@@ -107,6 +139,7 @@ export function PagesList({ store, session, theme }: { store: PageStore; session
   const pages = usePages(store)
   const [query, setQuery] = useState('')
   const [creating, setCreating] = useState(false)
+  const [renaming, setRenaming] = useState<string | null>(null)
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -175,13 +208,24 @@ export function PagesList({ store, session, theme }: { store: PageStore; session
               {rows.map(({ page, words }) => (
                 <tr key={page.id} data-template={page.template || undefined}>
                   <td>
-                    <a className="pages-table__name" href={routes.page(page.id)}>
-                      <span className="pages-table__icon">{page.template ? <Lock size={15} /> : <FileText size={15} />}</span>
-                      <span>
-                        {page.title || 'Untitled page'}
-                        {page.clonedFrom && <small>Cloned from {page.clonedFrom}</small>}
-                      </span>
-                    </a>
+                    {renaming === page.id ? (
+                      <RenameForm
+                        page={page}
+                        onCancel={() => setRenaming(null)}
+                        onSave={title => {
+                          store.update(page.id, { title })
+                          setRenaming(null)
+                        }}
+                      />
+                    ) : (
+                      <a className="pages-table__name" href={routes.page(page.id)}>
+                        <span className="pages-table__icon">{page.template ? <Lock size={15} /> : <FileText size={15} />}</span>
+                        <span>
+                          {page.title || 'Untitled page'}
+                          {page.clonedFrom && <small>Cloned from {page.clonedFrom}</small>}
+                        </span>
+                      </a>
+                    )}
                   </td>
                   <td>
                     {page.template ? <span className="pg-pill" data-tone="info">Template · read-only</span> : <span className="pg-pill" data-tone="good">Your page</span>}
@@ -202,6 +246,11 @@ export function PagesList({ store, session, theme }: { store: PageStore; session
                       <button type="button" className="btn btn--sm" onClick={() => clone(page)}>
                         <Copy size={14} /> Clone
                       </button>
+                      {!page.template && (
+                        <button type="button" className="icon-btn" title={`Rename ${page.title}`} aria-label={`Rename ${page.title}`} onClick={() => setRenaming(page.id)}>
+                          <PencilLine size={16} />
+                        </button>
+                      )}
                       {!page.template && <DeleteButton name={page.title} onConfirm={() => store.remove(page.id)} />}
                     </div>
                   </td>

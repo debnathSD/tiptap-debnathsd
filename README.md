@@ -27,6 +27,7 @@ npm run dev
 - After signing in you land on the **Pages** list. It's a table of every page you can open, with name, type, who created it, creation date, last change and word count.
 - **Create new page** starts from a blank page or from the status-report template.
 - The built-in **status report is a read-only template**. Open it to read, or **Clone** it to get your own editable copy.
+- **Rename** your pages from the ✎ button in the list, or click the page name in the editor's top bar. Enter saves, Escape cancels. Templates can't be renamed.
 - Pages you create or clone belong to the signed-in account and are kept in that browser tab's session storage. Other accounts never see them, and they disappear when the tab closes.
 
 ## Using the editor

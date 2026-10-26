@@ -1,5 +1,5 @@
 import type { Editor, JSONContent } from '@tiptap/core'
-import { ArrowLeft, Copy, Download, Eye, FileUp, ListTree, Lock, LogOut, Monitor, Moon, MoreHorizontal, PanelRight, Pencil, PlayCircle, Sun } from 'lucide-react'
+import { ArrowLeft, Copy, Download, Eye, FileUp, ListTree, Lock, LogOut, Monitor, Moon, MoreHorizontal, PanelRight, Pencil, PencilLine, PlayCircle, Sun } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { signOut, type Session } from '../auth/verify'
 import { exportHTML, exportJSON, importJSONFile } from '../editor/lib/exportPage'
@@ -115,7 +115,18 @@ export function TopBar(props: Props) {
             <Lock size={13} /> {page.title}
           </span>
         ) : (
-          <input className="topbar__title-input" value={page.title} aria-label="Page name" onChange={e => props.onRename(e.target.value)} />
+          <label className="topbar__rename" title="Rename page">
+            <input
+              className="topbar__title-input"
+              value={page.title}
+              placeholder="Untitled page"
+              aria-label="Page name"
+              onChange={e => props.onRename(e.target.value)}
+              onBlur={e => !e.target.value.trim() && props.onRename('Untitled page')}
+              onKeyDown={e => (e.key === 'Enter' || e.key === 'Escape') && e.currentTarget.blur()}
+            />
+            <PencilLine size={14} aria-hidden="true" />
+          </label>
         )}
       </div>
 
@@ -136,6 +147,18 @@ export function TopBar(props: Props) {
           session={props.session}
           extra={close => (
             <>
+              {!readOnly && (
+                <MenuItem
+                  icon={<PencilLine size={15} />}
+                  label="Rename page"
+                  onSelect={() => {
+                    close()
+                    const input = document.querySelector<HTMLInputElement>('.topbar__title-input')
+                    input?.focus()
+                    input?.select()
+                  }}
+                />
+              )}
               <MenuItem icon={<Copy size={15} />} label={readOnly ? 'Clone to edit' : 'Duplicate page'} onSelect={() => (close(), props.onClone())} />
               <MenuItem icon={<Download size={15} />} label="Export HTML" onSelect={() => (close(), exportHTML(editor, theme.resolved))} />
               <MenuItem icon={<Download size={15} />} label="Export JSON" onSelect={() => (close(), exportJSON(editor))} />
