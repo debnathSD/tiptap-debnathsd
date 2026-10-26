@@ -26,6 +26,8 @@ export type Highlight = {
   /** Whether the cursor travels to and clicks the target. */
   click?: boolean
   label?: string
+  /** Put the label under the target, e.g. when the space above holds content it would cover. */
+  labelBelow?: boolean
 }
 
 export type TourStep = {
@@ -143,6 +145,39 @@ const ALL_STEPS: TourStep[] = [
     highlights: [
       { target: 'chart', at: 14, zoom: 1.5, label: 'Axis 97–98.5%, not zero' },
       { target: 'table', at: 96, zoom: 1.3, label: 'Movement pills' },
+    ],
+  },
+  {
+    shot: 'layouts',
+    title: 'Pages, slides or one canvas',
+    body: 'Lay a page out as Word-style pages, 16:9 PowerPoint slides or one seamless canvas. Content flows onto the next page by itself.',
+    points: ['Portrait: A4, Letter or Legal pages', 'Landscape: 13.33 × 7.5 in slides', 'Automatic breaks, or add one with /page'],
+    highlights: [
+      { target: 'layoutSwitch', at: 14, zoom: 2.0, click: true, label: 'Portrait · Landscape · Canvas' },
+      { target: 'gap', at: 80, zoom: 1.35, label: 'Automatic page breaks' },
+      { target: 'status', at: 142, zoom: 2.1, label: 'Slides counted live' },
+    ],
+  },
+  {
+    shot: 'headerFooter',
+    title: 'Headers and footers',
+    body: 'Double-click a page margin to edit its header or footer. Mix your own text with fields that fill in on every page.',
+    points: ['Left, center and right slots', 'Page number, count, title, author, date', 'Different first page and divider lines'],
+    highlights: [
+      { target: 'gap', at: 14, zoom: 1.45, click: true, label: 'Footer and header on every page' },
+      { target: 'slots', at: 80, zoom: 1.9, label: 'Left · center · right' },
+      { target: 'fields', at: 142, zoom: 1.9, click: true, label: 'Insert a field' },
+    ],
+  },
+  {
+    shot: 'downloads',
+    title: 'Download as PDF, Word or PowerPoint',
+    body: 'Take a page anywhere: a PDF exactly as laid out, an editable Word document, or a PowerPoint deck with one slide per page.',
+    points: ['PDF: one page per sheet', 'Word: real headings, tables, page numbers', 'PowerPoint: editable text on 16:9 slides'],
+    highlights: [
+      { target: 'button', at: 14, zoom: 2.1, click: true, label: 'Download' },
+      { target: 'menu', at: 80, zoom: 1.8, label: 'PDF · Word · PowerPoint' },
+      { target: 'pptx', at: 142, zoom: 2.1, click: true, label: 'Editable 16:9 slides', labelBelow: true },
     ],
   },
 ]

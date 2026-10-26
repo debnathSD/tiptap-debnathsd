@@ -107,7 +107,7 @@ export function FeatureStep({ step, index, total }: { step: Step; index: number;
         const top = toScreen(x + w / 2, y)
         const bottom = toScreen(x + w / 2, y + h)
         // Labels sit above the highlight unless that would leave the window.
-        const below = top.y < FRAME_Y + 150
+        const below = active.labelBelow || top.y < FRAME_Y + 150
         return <Callout x={Math.min(Math.max(top.x, FRAME_X + 160), FRAME_X + WIN_W - 160)} y={below ? bottom.y : top.y} below={below} text={active.label!} opacity={spotIn} />
       })()}
 

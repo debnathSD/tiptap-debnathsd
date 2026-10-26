@@ -10,7 +10,9 @@
  *
  * Music: D major, 102.4 BPM — three bars per feature chapter, so every chapter
  * cut lands on a bar line. Ambient intro → build under the page reveal → beat
- * drops on the first chapter → breakdown → final lift → logo hit and tail.
+ * drops on the first chapter → breakdown about halfway through the chapters →
+ * final lift → G–A–Bm cadence under the feature wall → logo hit and tail. The
+ * sections follow the chapter count, so adding chapters keeps the arc.
  */
 import { build } from 'esbuild'
 import { spawnSync } from 'node:child_process'
@@ -28,7 +30,7 @@ mkdirSync(audioDir, { recursive: true })
 
 await build({ entryPoints: [path.join(here, 'events.ts')], bundle: true, platform: 'node', format: 'esm', mainFields: ['module', 'main'], outfile: path.join(outDir, 'events.mjs'), logLevel: 'warning' })
 const { soundEvents } = await import(pathToFileURL(path.join(outDir, 'events.mjs')).href + `?t=${Date.now()}`)
-const { duration, drop, events } = soundEvents()
+const { duration, drop, scenes, events } = soundEvents()
 
 const SR = 48000
 const N = Math.ceil(duration * SR)
@@ -38,6 +40,12 @@ const BAR = 4 * BEAT
 const S16 = BEAT / 4
 const barAt = b => drop + b * BAR
 const outroHit = events.find(e => e.type === 'logoHit').t
+/** Bar where the feature wall starts: the cadence into the logo. */
+const CADENCE = Math.round((scenes.find(s => s.key === 'devices').start - drop) / BAR)
+/** Breakdown about halfway through the chapters, on a four-bar phrase. Two bars of breakdown, two of build, then the finale. */
+const BREAKDOWN = 4 * Math.round((CADENCE * 0.55) / 4)
+const BUILD = BREAKDOWN + 2
+const FINALE = BREAKDOWN + 4
 
 // ── DSP primitives ──────────────────────────────────────────────────────────
 
@@ -458,7 +466,7 @@ const MOTIF = [
 const lastGrooveBar = Math.floor((outroHit - drop) / BAR) // bars after this one are the outro
 
 function barChord(b) {
-  if (b >= 30) return ['G', 'A', 'Bm'][Math.min(b - 30, 2)]
+  if (b >= CADENCE) return ['G', 'A', 'Bm'][Math.min(b - CADENCE, 2)]
   return LOOP[((b % 4) + 4) % 4]
 }
 
@@ -516,18 +524,18 @@ reverseCymbal(drop, 1.8)
 // Groove — the chapters.
 for (let b = 0; b <= lastGrooveBar; b++) {
   if (b < 8) playBar(b, { bright: 0.45, arpBright: 0.55 })
-  else if (b < 16) playBar(b, { clapOn: true, shakerOn: true, bright: 0.55, arpBright: 0.65, motif: true })
-  else if (b < 18) playBar(b, { kickOn: false, bassOn: false, hats: false, bright: 0.7, arpBright: 0.3, motif: true })
-  else if (b < 20) playBar(b, { kickOn: true, clapOn: b === 19, hats: true, bright: 0.6, arpBright: 0.45 + (b - 18) * 0.2 })
-  else playBar(b, { clapOn: true, shakerOn: true, bright: 0.68, arpBright: 0.75, motif: b < 30, motifUp: 12 })
+  else if (b < BREAKDOWN) playBar(b, { clapOn: true, shakerOn: true, bright: 0.55, arpBright: 0.65, motif: true })
+  else if (b < BUILD) playBar(b, { kickOn: false, bassOn: false, hats: false, bright: 0.7, arpBright: 0.3, motif: true })
+  else if (b < FINALE) playBar(b, { kickOn: true, clapOn: b === FINALE - 1, hats: true, bright: 0.6, arpBright: 0.45 + (b - BUILD) * 0.2 })
+  else playBar(b, { clapOn: true, shakerOn: true, bright: 0.68, arpBright: 0.75, motif: b < CADENCE, motifUp: 12 })
 }
 crash(drop, 0.11)
 crash(barAt(8), 0.07)
-riser(barAt(18), barAt(20), 0.09)
-reverseCymbal(barAt(20), 1.6, 0.12)
-for (let s = 0; s < 16; s++) snare(barAt(19) + s * S16, 0.02 + 0.005 * s)
-crash(barAt(20), 0.11)
-crash(barAt(30), 0.09)
+riser(barAt(BUILD), barAt(FINALE), 0.09)
+reverseCymbal(barAt(FINALE), 1.6, 0.12)
+for (let s = 0; s < 16; s++) snare(barAt(FINALE - 1) + s * S16, 0.02 + 0.005 * s)
+crash(barAt(FINALE), 0.11)
+crash(barAt(CADENCE), 0.09)
 // Lift into the logo.
 riser(outroHit - 2.6, outroHit, 0.12)
 reverseCymbal(outroHit, 1.9, 0.15)
@@ -732,7 +740,7 @@ if (process.env.SOUNDTRACK_DEBUG) {
     for (const ch of bus[name]) for (let j = Math.round(t0 * SR); j < Math.min(N, Math.round(t1 * SR)); j++) (sum += ch[j] * ch[j]), n++
     return 10 * Math.log10(sum / n + 1e-12) + 20 * Math.log10(STEMS[name] ?? 1)
   }
-  const sections = { intro: [0, 7.5], build: [7.5, drop], groove: [drop, barAt(16)], breakdown: [barAt(16), barAt(18)], finale: [barAt(20), outroHit], tail: [outroHit, duration] }
+  const sections = { intro: [0, 7.5], build: [7.5, drop], groove: [drop, barAt(BREAKDOWN)], breakdown: [barAt(BREAKDOWN), barAt(BUILD)], finale: [barAt(FINALE), outroHit], tail: [outroHit, duration] }
   for (const [name, [t0, t1]] of Object.entries(sections))
     console.log(`${name.padEnd(10)} drums ${rms('drums', t0, t1).toFixed(1)}  pump ${rms('pump', t0, t1).toFixed(1)}  music ${rms('music', t0, t1).toFixed(1)}`)
   const peak = (name, t0, t1) => {

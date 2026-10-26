@@ -180,7 +180,7 @@ const editor = page => ({
   await shot(page, 'view', {
     title: 'A page, not a document',
     caption: 'Banner, page properties and KPI tiles — the status report as a SharePoint-style page.',
-    targets: { banner: '.pg-banner', kpis: '.pg-kpis', outline: '.outline', modeSwitch: '.mode-switch' },
+    targets: { banner: '.pg-banner', kpis: '.pg-kpis', outline: '.outline', modeSwitch: '.mode-switch:not(.layout-switch)' },
   })
 
   // Tall capture of the whole canvas for the scrolling reveal.
@@ -345,7 +345,111 @@ const editor = page => ({
   await context.close()
 }
 
-// ── 10. Phone ────────────────────────────────────────────────────────────────
+/** Switch layout with the real top-bar control and let pagination settle. */
+async function layout(page, name) {
+  await page.click(`.layout-switch button[aria-label="${name}"]`)
+  await page.waitForTimeout(900)
+}
+
+/** Scroll the canvas so the first gap between two sheets sits at `fraction` of the canvas height. */
+async function centerGap(page, fraction = 0.55) {
+  await page.evaluate(f => {
+    const canvas = document.querySelector('.pg-canvas')
+    const gap = document.querySelector('.pg-page-gap__between')
+    if (!canvas || !gap) return
+    const c = canvas.getBoundingClientRect()
+    canvas.scrollTop += gap.getBoundingClientRect().top - c.top - c.height * f
+  }, fraction)
+  await page.waitForTimeout(300)
+}
+
+// ── 10. Layouts: portrait pages, 16:9 slides, seamless canvas ───────────────
+{
+  const { context, page } = await open({ theme: 'light' })
+  await openClone(page)
+  await page.click('.pane .pane__header .icon-btn') // close the property pane: more room for the slides
+  await layout(page, 'Landscape')
+  await centerGap(page, 0.62)
+  await page.mouse.move(720, 893) // rest on the status bar, away from block handles
+  await shot(page, 'layouts', {
+    title: 'Pages, slides or one canvas',
+    caption: 'Word-style pages, 16:9 slides or a seamless canvas, with automatic page breaks.',
+    targets: {
+      layoutSwitch: '.layout-switch',
+      gap: '.pg-page-gap',
+      footer: '.pg-page-gap .pg-hf--footer',
+      status: '.statusbar__layout',
+      sheet: '.pg-sheet',
+    },
+  })
+  await context.close()
+}
+
+// ── 11. Header & footer (dark) ───────────────────────────────────────────────
+{
+  const { context, page } = await open({ theme: 'dark' })
+  await openClone(page)
+  await layout(page, 'Portrait')
+  await centerGap(page, 0.5)
+  // Double-click the footer band, like a reader would in Word, then customise it.
+  await page.dblclick('.pg-page-gap .pg-hf--footer')
+  await page.waitForSelector('.hf-pane')
+  await page.fill('input[aria-label="Header left"]', 'Contoso · Board update')
+  await page.click('input[aria-label="Header right"]')
+  await page.click('.hf-field[title="Insert {date}"]')
+  await page.click('.hf-pane button[aria-label="Divider lines"]')
+  await page.waitForTimeout(500)
+  await page.evaluate(() => {
+    const body = document.querySelector('.hf-pane')
+    const slots = document.querySelector('.hf-pane .hf-slots')
+    if (body && slots) body.scrollTop += slots.getBoundingClientRect().top - body.getBoundingClientRect().top - 120
+    document.activeElement?.blur()
+  })
+  await centerGap(page, 0.5)
+  await page.mouse.move(700, 880)
+  await shot(page, 'headerFooter', {
+    title: 'Headers and footers',
+    caption: 'Left, center and right slots with page numbers, title, author and date fields.',
+    targets: {
+      gap: '.pg-page-gap',
+      header: '.pg-page-gap .pg-hf--header',
+      footer: '.pg-page-gap .pg-hf--footer',
+      pane: '.hf-pane',
+      presets: '.hf-presets',
+      slots: '.hf-pane .hf-slots',
+      fields: '.hf-fields',
+    },
+    theme: 'dark',
+  })
+  await context.close()
+}
+
+// ── 12. Downloads ────────────────────────────────────────────────────────────
+{
+  const { context, page } = await open({ theme: 'light' })
+  await openClone(page)
+  await page.click('.pane .pane__header .icon-btn')
+  await layout(page, 'Portrait')
+  await centerGap(page, 0.6)
+  await page.click('button[title="Download"]')
+  await page.waitForSelector('.download-menu')
+  await page.hover('.download-menu button:nth-of-type(3)')
+  await shot(page, 'downloads', {
+    title: 'Download as PDF, Word or PowerPoint',
+    caption: 'PDF as laid out, an editable Word document and a PowerPoint deck.',
+    targets: {
+      button: 'button[title="Download"]',
+      menu: '.download-menu',
+      pdf: '.download-menu button:nth-of-type(1)',
+      word: '.download-menu button:nth-of-type(2)',
+      pptx: '.download-menu button:nth-of-type(3)',
+      gap: '.pg-page-gap',
+    },
+  })
+  await context.close()
+}
+
+// ── 13. Phone ────────────────────────────────────────────────────────────────
 {
   const viewport = { width: 390, height: 844 }
   const { context, page } = await open({ theme: 'dark', viewport, scale: 3 })

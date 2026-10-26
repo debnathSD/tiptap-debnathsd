@@ -71,7 +71,7 @@ function Tutorial() {
   const box = rect ? rect.map(v => v * scale) : null
   const cursor = box && highlight?.click ? { x: tx + (box[0] + box[2] / 2) * cam.z, y: ty + (box[1] + box[3] / 2) * cam.z } : null
   const label = box && highlight?.label ? { x: tx + (box[0] + box[2] / 2) * cam.z, top: ty + box[1] * cam.z, bottom: ty + (box[1] + box[3]) * cam.z } : null
-  const labelBelow = label ? label.top < 70 : false
+  const labelBelow = label ? highlight?.labelBelow || label.top < 70 : false
 
   return (
     <section className="tutorial" aria-label="Step-by-step tutorial">

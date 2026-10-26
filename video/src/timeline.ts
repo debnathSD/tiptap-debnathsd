@@ -53,6 +53,11 @@ export const FEATURE_CHIPS = [
   'Outline / TOC',
   'Folding headings',
   'Reading time',
+  'Portrait pages',
+  '16:9 slides',
+  'Page breaks',
+  'Headers & footers',
+  'PDF, Word & PowerPoint',
   'HTML & JSON export',
 ]
 export const CHIP_AT = (i: number) => 24 + i * 4

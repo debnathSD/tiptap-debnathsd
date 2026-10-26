@@ -60,11 +60,11 @@
           100,
           196,
           1240,
-          249
+          258
         ],
         "cloneTemplate": [
           1251,
-          252,
+          254,
           74,
           28
         ]
@@ -364,6 +364,150 @@
           493,
           1048,
           401
+        ]
+      }
+    },
+    "layouts": {
+      "file": "layouts.jpg",
+      "title": "Pages, slides or one canvas",
+      "caption": "Word-style pages, 16:9 slides or a seamless canvas, with automatic page breaks.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "layoutSwitch": [
+          802,
+          7,
+          315,
+          37
+        ],
+        "gap": [
+          292,
+          493,
+          1124,
+          152
+        ],
+        "footer": [
+          292,
+          536,
+          1124,
+          42
+        ],
+        "status": [
+          14,
+          878,
+          79,
+          18
+        ],
+        "sheet": [
+          292,
+          -64,
+          1124,
+          5236
+        ]
+      }
+    },
+    "headerFooter": {
+      "file": "headerFooter.jpg",
+      "title": "Headers and footers",
+      "caption": "Left, center and right slots with page numbers, title, author and date fields.",
+      "theme": "dark",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "gap": [
+          297,
+          277,
+          794,
+          308
+        ],
+        "header": [
+          297,
+          513,
+          794,
+          72
+        ],
+        "footer": [
+          297,
+          413,
+          794,
+          72
+        ],
+        "pane": [
+          1120,
+          97,
+          320,
+          775
+        ],
+        "presets": [
+          1139,
+          112,
+          283,
+          110
+        ],
+        "slots": [
+          1139,
+          281,
+          283,
+          56
+        ],
+        "fields": [
+          1139,
+          510,
+          283,
+          62
+        ]
+      }
+    },
+    "downloads": {
+      "file": "downloads.jpg",
+      "title": "Download as PDF, Word or PowerPoint",
+      "caption": "PDF as laid out, an editable Word document and a PowerPoint deck.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "button": [
+          1157,
+          10,
+          32,
+          32
+        ],
+        "menu": [
+          919,
+          48,
+          270,
+          220
+        ],
+        "pdf": [
+          926,
+          87,
+          256,
+          70
+        ],
+        "word": [
+          926,
+          156,
+          256,
+          52
+        ],
+        "pptx": [
+          926,
+          208,
+          256,
+          52
+        ],
+        "gap": [
+          457,
+          354,
+          794,
+          308
         ]
       }
     },
