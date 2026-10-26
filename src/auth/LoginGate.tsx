@@ -1,10 +1,10 @@
 import { Eye, EyeOff, LoaderCircle, LockKeyhole } from 'lucide-react'
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { hasSession, signIn } from './verify'
+import { currentSession, signIn, type Session } from './verify'
 
 /** Sign-in screen shown before the editor loads. */
-export function LoginGate({ children }: { children: ReactNode }) {
-  const [authed, setAuthed] = useState(hasSession)
+export function LoginGate({ children }: { children: (session: Session) => ReactNode }) {
+  const [session, setSession] = useState(currentSession)
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
@@ -12,7 +12,7 @@ export function LoginGate({ children }: { children: ReactNode }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  if (authed) return <>{children}</>
+  if (session) return <>{children(session)}</>
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -22,9 +22,9 @@ export function LoginGate({ children }: { children: ReactNode }) {
     }
     setBusy(true)
     setError(null)
-    const ok = await signIn(user, password, remember)
+    const signedIn = await signIn(user, password, remember)
     setBusy(false)
-    if (ok) setAuthed(true)
+    if (signedIn) setSession(signedIn)
     else {
       setPassword('')
       setError("That user ID and password don't match.")

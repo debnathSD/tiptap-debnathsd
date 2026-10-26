@@ -11,9 +11,7 @@ function Root() {
   // Owned here so the sign-in screen and the app share one light/dark choice.
   const theme = useTheme()
   return (
-    <LoginGate>
-      <App theme={theme} />
-    </LoginGate>
+    <LoginGate>{session => <App session={session} theme={theme} />}</LoginGate>
   )
 }
 

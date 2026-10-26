@@ -11,3 +11,6 @@ sharepoint-images/
 # Local Claude Code tooling
 .claude/
 *.tsbuildinfo
+
+# Remotion render scratch
+video/out/

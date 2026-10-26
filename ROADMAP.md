@@ -74,7 +74,18 @@ Status: ✅ shipped · 🟡 partial · ⬜ planned
 | Feature | Notes |
 | --- | --- |
 | Hosting | GitHub Actions builds every push to `main` and publishes it to the `gh-pages` branch (GitHub Pages) |
-| Sign-in gate | The shipped bundle holds only a salted PBKDF2 (600k iterations) verifier. Client-side only, see README |
+| Sign-in gate | Multiple accounts. The bundle holds only one salted PBKDF2 (600k iterations) verifier per account. Client-side only, see README |
+| Pages list | Home screen table: name, type, created by, created, last modified, words; search; create, clone, delete |
+| Templates | The status report is a read-only template; **Clone** makes an editable copy |
+| Per-user pages | Created and cloned pages belong to the signed-in account and last for the browser session |
+
+## Phase 6b — Product tour ✅
+
+| Feature | Notes |
+| --- | --- |
+| Demo video | Remotion + React Three Fiber + cannon-es physics. Real web-part tiles fall and assemble into a page, then one chapter per feature with zoom, spotlight, cursor and explanation |
+| Animated tutorial | In-app `#/tour` walkthrough of the same chapters over real screenshots; auto-play and keyboard controls |
+| Real captures | Playwright captures the running app plus the position of each UI element, so highlights land on real controls |
 
 ---
 
@@ -98,7 +109,7 @@ then governance.
 
 | Feature | Suggested approach |
 | --- | --- |
-| Page templates | Save and load JSON documents, starting from the bundled sample |
+| More page templates | More read-only templates alongside the status report; "Save as template" |
 | Section templates | "Save section as template" stores a section's JSON in the catalog |
 
 ### Phase 9 — Real-time co-authoring (Fluid / Loop-style)
@@ -113,6 +124,6 @@ then governance.
 
 | Feature | Suggested approach |
 | --- | --- |
-| Real authentication | Move the sign-in gate server-side (OIDC / Entra ID) once there is a backend |
+| Real authentication and storage | Move sign-in server-side (OIDC / Entra ID) and keep pages in a database, so they outlive the session and can be shared |
 | Draft → publish, approvals, scheduling | Store documents server-side with a status field |
 | Audience targeting, page analytics, accessibility checker | Built on the server-side document store |

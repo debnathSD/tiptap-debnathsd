@@ -2,36 +2,6 @@ import type { Editor, JSONContent } from '@tiptap/core'
 import contentCss from '../../styles/content.css?raw'
 import tokensCss from '../../styles/tokens.css?raw'
 
-const STORAGE_KEY = 'tiptap-pages:document:v1'
-
-export function loadSavedDocument(): JSONContent | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    return parsed?.type === 'doc' ? parsed : null
-  } catch {
-    return null
-  }
-}
-
-export function saveDocument(doc: JSONContent): boolean {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(doc))
-    return true
-  } catch {
-    return false
-  }
-}
-
-export function clearSavedDocument() {
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    /* storage unavailable — nothing to clear */
-  }
-}
-
 function download(filename: string, contents: string, type: string) {
   const url = URL.createObjectURL(new Blob([contents], { type }))
   const a = document.createElement('a')

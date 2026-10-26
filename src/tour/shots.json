@@ -1,0 +1,424 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "shots": {
+    "signin": {
+      "file": "signin.jpg",
+      "title": "Sign in",
+      "caption": "Your private workspace opens behind a sign-in screen.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "card": [
+          530,
+          126,
+          380,
+          468
+        ],
+        "user": [
+          559,
+          353,
+          322,
+          41
+        ],
+        "password": [
+          559,
+          433,
+          322,
+          41
+        ],
+        "submit": [
+          559,
+          522,
+          322,
+          43
+        ]
+      }
+    },
+    "pages": {
+      "file": "pages.jpg",
+      "title": "All your pages in one list",
+      "caption": "Name, type, author, creation date and last change for every page.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "create": [
+          1170,
+          135,
+          170,
+          41
+        ],
+        "table": [
+          100,
+          196,
+          1240,
+          229
+        ],
+        "cloneTemplate": [
+          1251,
+          252,
+          74,
+          28
+        ]
+      }
+    },
+    "template": {
+      "file": "template.jpg",
+      "title": "Templates are read-only",
+      "caption": "Clone the template to get an editable copy.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "banner": [
+          0,
+          52,
+          1440,
+          50
+        ],
+        "clone": [
+          1305,
+          9,
+          123,
+          33
+        ]
+      }
+    },
+    "view": {
+      "file": "view.jpg",
+      "title": "A page, not a document",
+      "caption": "Banner, page properties and KPI tiles — the status report as a SharePoint-style page.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "banner": [
+          268,
+          52,
+          1172,
+          196
+        ],
+        "kpis": [
+          330,
+          347,
+          1048,
+          194
+        ],
+        "outline": [
+          0,
+          52,
+          268,
+          848
+        ],
+        "modeSwitch": [
+          1273,
+          7,
+          155,
+          37
+        ]
+      }
+    },
+    "page-full": {
+      "file": "page-full.jpg",
+      "theme": "light",
+      "viewport": {
+        "width": 1172,
+        "height": 4026.015625
+      },
+      "rects": {}
+    },
+    "regions": {
+      "file": "regions.jpg",
+      "title": "Lay out regions",
+      "caption": "Every page is a stack of sections — one, two or three columns, or one-third layouts.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "section": [
+          302,
+          178,
+          784,
+          486
+        ],
+        "toolbar": [
+          836,
+          162,
+          239,
+          32
+        ],
+        "add": [
+          681,
+          651,
+          26,
+          26
+        ],
+        "menu": [
+          584,
+          683,
+          220,
+          232
+        ],
+        "pane": [
+          1120,
+          97,
+          320,
+          775
+        ]
+      }
+    },
+    "slash": {
+      "file": "slash.jpg",
+      "title": "Type “/” to insert",
+      "caption": "Sections, web parts and data blocks from one searchable catalog.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "menu": [
+          708,
+          126,
+          300,
+          354
+        ],
+        "caret": [
+          708,
+          102,
+          4,
+          18
+        ],
+        "insert": [
+          12,
+          58,
+          97,
+          32
+        ]
+      }
+    },
+    "pane": {
+      "file": "pane.jpg",
+      "title": "Configure in the property pane",
+      "caption": "Click a web part to edit it — tiles, values, status tones and progress, live.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "kpis": [
+          317,
+          217,
+          754,
+          388
+        ],
+        "pane": [
+          1120,
+          97,
+          320,
+          775
+        ],
+        "crumbs": [
+          1121,
+          160,
+          319,
+          39
+        ],
+        "items": [
+          1139,
+          362,
+          283,
+          732
+        ]
+      }
+    },
+    "colors": {
+      "file": "colors.jpg",
+      "title": "Color regions and blocks",
+      "caption": "Soft or strong section backgrounds, accent borders and tinted, solid or barred blocks.",
+      "theme": "dark",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "section": [
+          302,
+          44,
+          784,
+          141
+        ],
+        "pane": [
+          1120,
+          97,
+          320,
+          775
+        ],
+        "swatches": [
+          1139,
+          682,
+          283,
+          54
+        ],
+        "heading": [
+          302,
+          217,
+          784,
+          48
+        ]
+      }
+    },
+    "fold": {
+      "file": "fold.jpg",
+      "title": "Fold and jump",
+      "caption": "Any heading folds its content, even across regions; the outline jumps anywhere.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "folded": [
+          315,
+          353,
+          1078,
+          48
+        ],
+        "outline": [
+          0,
+          110,
+          267,
+          410
+        ],
+        "toggle": [
+          287,
+          365,
+          24,
+          24
+        ]
+      }
+    },
+    "webparts": {
+      "file": "webparts.jpg",
+      "title": "Callouts, FAQs, links and cards",
+      "caption": "Fast-win web parts: collapsible FAQs, quick links and editorial cards.",
+      "theme": "dark",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "faq": [
+          336,
+          127,
+          672,
+          104
+        ],
+        "links": [
+          1036,
+          113,
+          336,
+          266
+        ],
+        "cards": [
+          315,
+          503,
+          1078,
+          373
+        ]
+      }
+    },
+    "data": {
+      "file": "data.jpg",
+      "title": "Data that reads at a glance",
+      "caption": "Bar charts with honest axes, status pills and styled tables with cell colors.",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "rects": {
+        "chart": [
+          330,
+          142,
+          514,
+          291
+        ],
+        "table": [
+          330,
+          493,
+          1048,
+          401
+        ]
+      }
+    },
+    "mobile": {
+      "file": "mobile.jpg",
+      "title": "Ready on any screen",
+      "caption": "Columns stack and panels tuck away on phones.",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "rects": {}
+    }
+  },
+  "crops": {
+    "kpi": {
+      "file": "crop-kpi.jpg",
+      "width": 141,
+      "height": 194
+    },
+    "chart": {
+      "file": "crop-chart.jpg",
+      "width": 514,
+      "height": 291
+    },
+    "callout": {
+      "file": "crop-callout.jpg",
+      "width": 1048,
+      "height": 72
+    },
+    "card": {
+      "file": "crop-card.jpg",
+      "width": 341,
+      "height": 333
+    },
+    "links": {
+      "file": "crop-links.jpg",
+      "width": 336,
+      "height": 266
+    },
+    "table": {
+      "file": "crop-table.jpg",
+      "width": 1048,
+      "height": 401
+    },
+    "pill": {
+      "file": "crop-pill.jpg",
+      "width": 1048,
+      "height": 194
+    },
+    "faq": {
+      "file": "crop-faq.jpg",
+      "width": 672,
+      "height": 104
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CREDENTIALS } from './credentials'
-import { digest, hasSession, signIn } from './verify'
+import { currentSession, digest, signIn } from './verify'
 
 describe('sign-in verifier', () => {
   it('derives the same digest as scripts/hash-credentials.mjs', async () => {
@@ -8,13 +8,21 @@ describe('sign-in verifier', () => {
     expect(await digest('  someone ', 'example-only', 'MDEyMzQ1Njc4OWFiY2RlZg==', 1000)).toBe('XVmTui7hjSWJDw/2RlLTJ1dAmlHaF2PHpZThMOrAMFE=')
   })
 
-  it('ships a verifier, not credentials', () => {
+  it('ships one salted verifier per account, not credentials', () => {
     expect(CREDENTIALS.iterations).toBeGreaterThanOrEqual(600_000)
-    expect(Object.keys(CREDENTIALS).sort()).toEqual(['hash', 'iterations', 'salt'])
+    expect(CREDENTIALS.accounts.length).toBeGreaterThanOrEqual(2)
+    for (const account of CREDENTIALS.accounts) expect(Object.keys(account).sort()).toEqual(['hash', 'salt'])
+    expect(new Set(CREDENTIALS.accounts.map(a => a.salt)).size).toBe(CREDENTIALS.accounts.length)
   })
 
   it('rejects wrong credentials and leaves no session behind', async () => {
-    expect(await signIn('nobody', 'wrong', true)).toBe(false)
-    expect(hasSession()).toBe(false)
+    expect(await signIn('nobody', 'wrong', true)).toBeNull()
+    expect(currentSession()).toBeNull()
+  })
+
+  it('ignores a forged session that names no real account', () => {
+    sessionStorage.setItem('tiptap-pages:session', JSON.stringify({ user: 'mallory', account: 'not-a-real-digest' }))
+    expect(currentSession()).toBeNull()
+    sessionStorage.clear()
   })
 })
