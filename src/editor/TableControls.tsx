@@ -13,7 +13,8 @@ import { MIN_COLUMN_WIDTH, MIN_ROW_HEIGHT, scaleWidths } from './extensions/tabl
  * through the table extension's own column resizing.
  *
  * Drawn in a fixed layer over the canvas, so it stays put when pages are
- * scaled to fit the window, and is clipped to the canvas.
+ * scaled to fit the window, and is clipped to the canvas. Mounted in the
+ * editor's scoped .pg-root when there is one, so scoped styles apply.
  */
 
 type Box = { left: number; top: number; width: number; height: number }
@@ -151,6 +152,8 @@ export function TableControls({ editor }: { editor: Editor }) {
 
   if (!geo) return null
   const { box, clip, rows, scale } = geo
+  // Inside the editor's scoped root when there is one (Superset scopes every style under .pg-root), else the body.
+  const host = (editor.view.dom.closest('.pg-root') as HTMLElement | null) ?? document.body
   // Positions inside the clipped layer.
   const x = (v: number) => v - clip.left
   const y = (v: number) => v - clip.top
@@ -282,6 +285,6 @@ export function TableControls({ editor }: { editor: Editor }) {
         </div>
       )}
     </div>,
-    document.body,
+    host,
   )
 }
