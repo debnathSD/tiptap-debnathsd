@@ -139,30 +139,41 @@ function measure(view: EditorView, settings: PageSettings) {
   const gaps = Array.from(view.dom.querySelectorAll<HTMLElement>(':scope > .pg-page-gap'))
   const gapHeight = (index: number) => gaps.filter(g => Number(g.dataset.index) <= index).reduce((sum, g) => sum + g.offsetHeight, 0)
 
-  const blocks: Array<{ index: number; pos: number; top: number; bottom: number; node: PMNode }> = []
+  const blocks: MeasuredBlock[] = []
   view.state.doc.forEach((node, pos, index) => {
     const dom = view.nodeDOM(pos) as HTMLElement | null
     if (!dom || !(dom instanceof HTMLElement)) return
     const shift = gapHeight(index)
     const top = dom.offsetTop - shift
-    blocks.push({ index, pos, top, bottom: top + dom.offsetHeight, node })
+    blocks.push({ index, pos, top, bottom: top + dom.offsetHeight, manualBreak: node.type.name === 'pageBreak' })
   })
+  return layoutPages(blocks, content)
+}
 
+/** A top-level block's natural (gap-free) position, in px from the top of the content. */
+export type MeasuredBlock = { index: number; pos: number; top: number; bottom: number; manualBreak: boolean }
+
+/** Where pages break: before a block that overflows the page, and after every manual page break. */
+export function layoutPages(blocks: MeasuredBlock[], content: number) {
   const breaks: PageBreakInfo[] = []
   let pageStart = 0
   let page = 1
+  // A manual break that overflows a full page moves to the top of the next one, and
+  // then has nothing left to force: otherwise it would leave a blank page behind.
+  let startedPage = -1
   blocks.forEach((block, i) => {
     if (i === 0) return
     const previous = blocks[i - 1]
     const top = block.top - pageStart
     const bottom = block.bottom - pageStart
-    const forced = previous.node.type.name === 'pageBreak'
+    const forced = previous.manualBreak && startedPage !== i - 1
     if (forced || (bottom > content && top > 0)) {
       // Fill from where the previous page's content ends to the bottom of its content box.
       breaks.push({ index: block.index, pos: block.pos, fill: Math.max(0, Math.round(content - (previous.bottom - pageStart))), page })
       // The next sheet's content box starts right after the gap, i.e. where the previous block ended.
       pageStart = previous.bottom
       page += 1
+      startedPage = i
     }
   })
   const last = blocks[blocks.length - 1]

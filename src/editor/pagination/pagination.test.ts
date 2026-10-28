@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { editorExtensions, schemaExtensions } from '../extensions'
 import { exportLayout } from '../export/run'
 import { pageGeometry } from './geometry'
-import { pageBreaks } from './pagination'
+import { layoutPages, pageBreaks, type MeasuredBlock } from './pagination'
 import { DEFAULT_PAGE_SETTINGS, fieldParts, fillFields, normalizeSettings, showsHeaderFooter, type PageSettings } from './settings'
 
 const vars = { title: 'Weekly update', author: 'alex.morgan', date: '26 October 2026' }
@@ -83,6 +83,37 @@ describe('page breaks', () => {
     editor.commands.setTextSelection(3)
     expect(editor.commands.insertPageBreak()).toBe(true)
     expect(editor.getJSON().content?.map(n => n.type).slice(0, 3)).toEqual(['section', 'pageBreak', 'paragraph'])
+  })
+
+  // Blocks laid out top to bottom on a 100 px tall content box: [top, bottom], and whether it is a manual break.
+  const blocks = (...items: Array<[top: number, bottom: number, manualBreak?: boolean]>): MeasuredBlock[] =>
+    items.map(([top, bottom, manualBreak = false], index) => ({ index, pos: index * 10, top, bottom, manualBreak }))
+  const startsOfPages = (layout: ReturnType<typeof layoutPages>) => layout.breaks.map(b => b.index)
+
+  it('breaks before a block that overflows the page', () => {
+    const layout = layoutPages(blocks([0, 60], [60, 130], [130, 150]), 100)
+    expect(startsOfPages(layout)).toEqual([1])
+    expect(layout.total).toBe(2)
+    expect(layout.breaks[0].fill).toBe(40)
+  })
+
+  it('starts a new page after a manual break', () => {
+    const layout = layoutPages(blocks([0, 40], [40, 40, true], [48, 80]), 100)
+    expect(startsOfPages(layout)).toEqual([2])
+    expect(layout.total).toBe(2)
+  })
+
+  it('does not leave a blank page when a manual break follows a full page', () => {
+    // The break itself spills past the bottom: it moves to the next page and forces nothing more.
+    const layout = layoutPages(blocks([0, 95], [103, 121, true], [129, 179], [179, 190]), 100)
+    expect(startsOfPages(layout)).toEqual([1])
+    expect(layout.total).toBe(2)
+  })
+
+  it('keeps forcing pages for later manual breaks', () => {
+    const layout = layoutPages(blocks([0, 95], [103, 121, true], [129, 150], [150, 150, true], [158, 170]), 100)
+    expect(startsOfPages(layout)).toEqual([1, 4])
+    expect(layout.total).toBe(3)
   })
 
   it('keeps page settings in plugin state without touching undo history', () => {
