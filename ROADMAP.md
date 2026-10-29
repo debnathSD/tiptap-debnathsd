@@ -84,9 +84,9 @@ Status: ✅ shipped · 🟡 partial · ⬜ planned
 | Feature | Notes |
 | --- | --- |
 | Demo video | Remotion + React Three Fiber + cannon-es physics. Real web-part tiles fall and assemble into a page, then one chapter per feature with zoom, spotlight, cursor and explanation |
-| Animated tutorial | In-app `#/tour` walkthrough of the same chapters over real screenshots; auto-play and keyboard controls |
+| Animated tutorial | In-app `#/tour` walkthrough of the same 13 chapters over real screenshots, including layouts, headers & footers and downloads; auto-play and keyboard controls |
 | Real captures | Playwright captures the running app plus the position of each UI element, so highlights land on real controls |
-| Score and sound design | Original music synthesized in code, with chapters on bar lines; a synced sound for every action; mastered to −16 LUFS |
+| Score and sound design | Original music synthesized in code, with chapters on bar lines; the musical arc is derived from the chapter count; a synced sound for every action; mastered to −16 LUFS |
 
 ## Phase 6c — Pages, slides and downloads ✅
 
@@ -94,12 +94,40 @@ Status: ✅ shipped · 🟡 partial · ⬜ planned
 | --- | --- |
 | Layouts | Portrait (A4 / Letter / Legal Word page), Landscape (16:9 PowerPoint slide, 13.33 × 7.5 in), Canvas (seamless). Switch any time; chosen when creating a page |
 | Automatic page breaks | Measured from the rendered blocks; breaks fall between top-level blocks. Sheets scale to fit narrow windows |
-| Manual page break | Page-level block from `/`, Insert or ⌘/Ctrl + Enter |
+| Manual page break | Page-level block from `/`, Insert or ⌘/Ctrl + Enter. The marker takes no room, and a break after a full page never leaves a blank one (pure `layoutPages`, unit-tested) |
 | Custom header & footer | Left / center / right slots with page number, page count, title, author and date fields; quick styles; different first page; divider lines; double-click a margin to edit |
 | Page setup | Paper size and margins |
 | PDF download | One page per sheet, as laid out |
 | Word download | Native document with Word headers/footers and live page-number fields |
 | PowerPoint download | One slide per landscape page; native text, lists and tables; images for visual web parts |
+
+## Phase 6d — Tables you can shape ✅
+
+| Feature | Notes |
+| --- | --- |
+| Colors | Palette or typed hex code (with or without `#`, short or long form) for the header row and any cell, each with an opacity slider. Text switches to a readable color at 60 % and above. Header colors stay separate from cell colors |
+| Resize | Drag any column or row border; double-click a row border to fit it; drag the corner grip to resize the whole table (one undo step), double-click it for full width |
+| Grow | **+** bars under and beside the table add a row or a column; a new column in a fixed-width table takes the narrowest width |
+| Size buttons | Full width, Even columns, Fit row heights |
+| Defaults | `/table` inserts a grid table; empty cells show no `/` placeholder |
+| Downloads | PDF, Word and PowerPoint keep the sizes and colors |
+
+## Phase 6e — Apache Superset edition ✅
+
+The same editor, in a fork of Apache Superset 6.1: [debnathSD/superset-tiptap](https://github.com/debnathSD/superset-tiptap).
+
+| Feature | Notes |
+| --- | --- |
+| Pages section | Pages in Superset's database, with owners, Draft / Published, read-only templates, clone, search and filters. Every web part, layout, header & footer and download from the phases above |
+| Live Superset charts | Searchable chart picker; drag a saved chart onto a page or click **+**. Charts render live, resize, refresh and open in Explore |
+| Presentations section | Slide decks from a brief plus a dashboard or up to 12 charts. Chart data is read with the viewer's permissions |
+| Presenton | [Presenton](https://presenton.ai) designs a PowerPoint deck; Superset embeds its viewer and editor through short-lived, scoped links; download the `.pptx` |
+| Claude | Writes an editable deck with live charts, KPI tiles and takeaways (strict JSON output, adaptive thinking) |
+| Plain draft | No AI: an editable deck with live charts and the key numbers |
+| Present mode | Fullscreen slideshow over the live slides: arrows, Page Up/Down, Space, Home/End, Esc |
+| Public hosting 🟡 | `deploy/oracle`: one Oracle Cloud Always Free VM with Postgres, Redis and HTTPS. Anyone can browse published content; editing needs an account; only admins spend Presenton credits. Ready to deploy; waiting on the VM |
+
+Fixes to the shared editor, pagination, export and table code are ported between the two repositories.
 
 ---
 
@@ -138,6 +166,6 @@ then governance.
 
 | Feature | Suggested approach |
 | --- | --- |
-| Real authentication and storage | Move sign-in server-side (OIDC / Entra ID) and keep pages in a database, so they outlive the session and can be shared |
-| Draft → publish, approvals, scheduling | Store documents server-side with a status field |
+| Real authentication and storage 🟡 | The Superset edition already keeps pages in a database behind Superset's sign-in and roles. For the standalone app: move sign-in server-side (OIDC / Entra ID) and keep pages in a database, so they outlive the session and can be shared |
+| Draft → publish, approvals, scheduling 🟡 | Draft / Published exists in the Superset edition. Approvals and scheduling: a status workflow on the server-side document store |
 | Audience targeting, page analytics, accessibility checker | Built on the server-side document store |
